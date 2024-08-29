@@ -16,7 +16,7 @@ import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
 import com.uade.tpo.MarketPlace.service.ProductoService;
 
 @RestController
-@RequestMapping("producto")
+@RequestMapping("api/producto")
 public class ProductoController {
 
     @Autowired
@@ -30,7 +30,7 @@ public class ProductoController {
     }
 
     // Método para obtener todos los productos
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<ProductoRequest>> obtenerProductos() {
         List<ProductoRequest> productos = productoService.obtenerProductos();
         return ResponseEntity.ok(productos);
