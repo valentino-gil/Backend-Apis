@@ -9,9 +9,9 @@ public class ProductoRequest {
     private String modelo;
     private int año;
     private double precio;
-    private Long usuarioId; // Cambiado de Usuario a Long
+    private Long usuarioId; 
 
-    // Constructor actualizado
+    
     public ProductoRequest(Long id, String marca, String modelo, int año, double precio, Long usuarioId) {
         this.id = id;
         this.marca = marca;
