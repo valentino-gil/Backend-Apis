@@ -48,7 +48,21 @@ public class ProductoServiceImpl implements ProductoService {
                 producto.getPrecio(),
                 producto.getUsuario().getId()); // Devolvemos el DTO con usuarioId
     }
+    public boolean eliminarProducto(Long id, String usuarioActual) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        
+        Usuario usuario = usuarioRepository.findBymail(usuarioActual)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        // Verifica si el usuario actual es el propietario del producto
+        if (producto.getUsuario().getId() == usuario.getId()) {
+            productoRepository.delete(producto);
+            return true;
+        }
+        
+        return false;
+    }
     
     public List<ProductoRequest> obtenerProductos() {
         List<Producto> productos = productoRepository.findAll();
