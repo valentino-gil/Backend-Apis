@@ -9,12 +9,12 @@ public class ProductoRequest {
     private String modelo;
     private int año;
     private double precio;
-    private int stock;
+    private Integer stock;
     private Long usuarioId; 
     
 
     
-    public ProductoRequest(Long id, String marca, String modelo, int año, double precio, int stock, Long usuarioId) {
+    public ProductoRequest(Long id, String marca, String modelo, int año, double precio, Integer stock, Long usuarioId) {
         this.id = id;
         this.marca = marca;
         this.modelo = modelo;

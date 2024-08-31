@@ -13,7 +13,7 @@ import lombok.Data;
 @Data
 public class Producto {
     public Producto(){
-
+        
     }
     
     @Id
@@ -32,8 +32,8 @@ public class Producto {
     @Column
     private double precio;
 
-    @Column
-    private int stock;
+    @Column(nullable = false)
+    private Integer stock = 1;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")

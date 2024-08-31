@@ -2,30 +2,59 @@ package com.uade.tpo.MarketPlace.controllers;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import com.uade.tpo.MarketPlace.entity.Producto;
+import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.entity.dto.FiltroProducto;
 import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
+import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
 import com.uade.tpo.MarketPlace.service.ProductoService;
 
 @RestController
 @RequestMapping("api/producto")
 public class ProductoController {
 
+
+    
+
+    @Autowired
+    private UsuarioRepository UsuarioRepository;
     @Autowired
     private ProductoService productoService;
 
     // Método para registrar un producto
-    @PostMapping("/{usuarioId}")
-    public ResponseEntity<ProductoRequest> registrarProducto(@PathVariable Long usuarioId, @RequestBody ProductoRequest productoRequest) {
-        ProductoRequest result = productoService.registrarProducto(usuarioId, productoRequest);
-        return ResponseEntity.created(URI.create("/productos/" + result.getId())).body(result);
+    @PostMapping
+public ResponseEntity<ProductoRequest> registrarProducto(@RequestBody ProductoRequest productoRequest, 
+                                                         @AuthenticationPrincipal UserDetails userDetails) {
+    // Obtener el nombre del usuario actual desde el token
+    String usuarioActual = userDetails.getUsername();
+    
+    
+    // Obtener el usuario desde el repositorio
+    Optional<Usuario> usuarioOpt = UsuarioRepository.findBymail(usuarioActual);
+
+    if (!usuarioOpt.isPresent()) {
+        // Manejar el caso en que el usuario no exista
+        
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // O cualquier respuesta que desees
     }
+
+    Long usuarioId = usuarioOpt.get().getId();
+    if (productoRequest.getStock()==null){
+        productoRequest.setStock(1);
+    }
+    ProductoRequest result = productoService.registrarProducto(usuarioId, productoRequest);
+    return ResponseEntity.created(URI.create("/productos/" + result.getId())).body(result);
+}
 
     // Método para obtener todos los productos
     @GetMapping("/all")
