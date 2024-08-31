@@ -53,6 +53,13 @@ public class Usuario implements UserDetails{
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "vendedor")
+    private List<Calificacion> calificacionesRecibidas;
+
+    @OneToMany(mappedBy = "comprador")
+    private List<Calificacion> calificacionesRealizadas;
+
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
