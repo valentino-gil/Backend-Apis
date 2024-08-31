@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.MarketPlace.entity.Producto;
 import com.uade.tpo.MarketPlace.entity.Usuario;
+import com.uade.tpo.MarketPlace.entity.dto.FiltroProducto;
 import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
 import com.uade.tpo.MarketPlace.repository.ProductoRepository;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
@@ -27,7 +28,7 @@ public class ProductoServiceImpl implements ProductoService {
 
         // Verificamos si el auto ya fue registrado por el usuario
         if (productoRepository.existsByMarcaAndModeloAndUsuarioId(
-                productoRequest.getMarca(), productoRequest.getModelo(), usuarioId)) {
+                productoRequest.getMarca(), productoRequest.getModelo(), usuarioId, productoRequest.getAño())) {
             throw new IllegalArgumentException("El usuario ya tiene registrado un auto de esta marca y modelo");
         }
 
@@ -38,14 +39,29 @@ public class ProductoServiceImpl implements ProductoService {
         producto.setAño(productoRequest.getAño());
         producto.setPrecio(productoRequest.getPrecio());
         producto.setUsuario(usuario);
+        producto.setStock(productoRequest.getStock());
         productoRepository.save(producto);
 
+        return convertirAProductoRequest(producto);
+                
+    }
+
+    
+    public List<ProductoRequest> obtenerProductos() {
+        List<Producto> productos = productoRepository.findAll();
+    return productos.stream()
+        .map(producto -> convertirAProductoRequest(producto))
+        .collect(Collectors.toList());
+    }
+
+    private ProductoRequest convertirAProductoRequest(Producto producto) {
         return new ProductoRequest(
                 producto.getId(),
                 producto.getMarca(),
                 producto.getModelo(),
                 producto.getAño(),
                 producto.getPrecio(),
+                producto.getStock(),
                 producto.getUsuario().getId()); // Devolvemos el DTO con usuarioId
     }
     public boolean eliminarProducto(Long id, String usuarioActual) {
@@ -54,26 +70,38 @@ public class ProductoServiceImpl implements ProductoService {
         
         Usuario usuario = usuarioRepository.findBymail(usuarioActual)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
+    
         // Verifica si el usuario actual es el propietario del producto
-        if (producto.getUsuario().getId() == usuario.getId()) {
+        if (producto.getUsuario().getId().equals(usuario.getId())) {
             productoRepository.delete(producto);
             return true;
         }
+        System.out.println("Usuario Actual: " + usuarioActual);
+        System.out.println("Usuario desde la base de datos: " + usuario.getId());
+        System.out.println("ID del Producto: " + producto.getUsuario().getId());
+
         
         return false;
     }
     
-    public List<ProductoRequest> obtenerProductos() {
-        List<Producto> productos = productoRepository.findAll();
+
+    public List<ProductoRequest> filtrarProductos(FiltroProducto filtro) {
+        // Obtener la lista de entidades Producto filtradas
+        List<Producto> productos = productoRepository.filtrarProductos(
+            filtro.getMarca(),
+            filtro.getModelo(),
+            filtro.getPrecioMin(),
+            filtro.getPrecioMax(),
+            filtro.getAñoMin(),
+            filtro.getAñoMax()
+        );
+        
+        // Convertir la lista de productos en una lista de ProductoRequest
         return productos.stream()
-            .map(producto -> new ProductoRequest(
-                    producto.getId(),
-                    producto.getMarca(),
-                    producto.getModelo(),
-                    producto.getAño(),
-                    producto.getPrecio(),
-                    producto.getUsuario().getId())) // Mapea el producto a ProductoRequest
+            .map(this::convertirAProductoRequest)
             .collect(Collectors.toList());
     }
+    
+    
+
 }
