@@ -36,8 +36,21 @@ public class ProductoController {
 
 
     @GetMapping("/all/filtrar")
-public List<ProductoRequest> filtrarProductos(FiltroProducto filtro) {
-    return productoService.filtrarProductos(filtro);
+public ResponseEntity<List<ProductoRequest>> filtrarProductos(
+    @RequestParam(required = false) String marca,
+    @RequestParam(required = false) String modelo,
+    @RequestParam(required = false) Double precioMin,
+    @RequestParam(required = false) Double precioMax,
+    @RequestParam(required = false) Integer añoMin,
+    @RequestParam(required = false) Integer añoMax
+) {
+    // Crear un objeto FiltroProducto con los parámetros recibidos
+    FiltroProducto filtro = new FiltroProducto(marca, modelo, precioMin, precioMax, añoMin, añoMax);
+    
+    // Obtener productos filtrados desde el servicio
+    List<ProductoRequest> productosFiltrados = productoService.filtrarProductos(filtro);
+    
+    return ResponseEntity.ok(productosFiltrados);
 }
 
 

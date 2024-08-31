@@ -19,13 +19,13 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
        + "(:precioMax IS NULL OR p.precio <= :precioMax) AND "
        + "(:añoMin IS NULL OR p.año >= :añoMin) AND "
        + "(:añoMax IS NULL OR p.año <= :añoMax)")
-List<Producto> filtrarProductos(
-    @Param("marca") String marca,
-    @Param("modelo") String modelo,
-    @Param("precioMin") Double precioMin,
-    @Param("precioMax") Double precioMax,
-    @Param("añoMin") Integer añoMin,
-    @Param("añoMax") Integer añoMax
+    List<Producto> filtrarProductos(
+        @Param("marca") String marca,
+        @Param("modelo") String modelo,
+        @Param("precioMin") Double precioMin,
+        @Param("precioMax") Double precioMax,
+        @Param("añoMin") Integer añoMin,
+        @Param("añoMax") Integer añoMax
     
-);
+    );
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.MarketPlace.entity.Producto;
 import com.uade.tpo.MarketPlace.entity.Usuario;
+import com.uade.tpo.MarketPlace.entity.dto.FiltroProducto;
 import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
 import com.uade.tpo.MarketPlace.repository.ProductoRepository;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
@@ -69,14 +70,36 @@ public class ProductoServiceImpl implements ProductoService {
         
         Usuario usuario = usuarioRepository.findBymail(usuarioActual)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
+    
         // Verifica si el usuario actual es el propietario del producto
-        if (producto.getUsuario().getId() == usuario.getId()) {
+        if (producto.getUsuario().getId().equals(usuario.getId())) {
             productoRepository.delete(producto);
             return true;
         }
+        System.out.println("Usuario Actual: " + usuarioActual);
+        System.out.println("Usuario desde la base de datos: " + usuario.getId());
+        System.out.println("ID del Producto: " + producto.getUsuario().getId());
+
         
         return false;
+    }
+    
+
+    public List<ProductoRequest> filtrarProductos(FiltroProducto filtro) {
+        // Obtener la lista de entidades Producto filtradas
+        List<Producto> productos = productoRepository.filtrarProductos(
+            filtro.getMarca(),
+            filtro.getModelo(),
+            filtro.getPrecioMin(),
+            filtro.getPrecioMax(),
+            filtro.getAñoMin(),
+            filtro.getAñoMax()
+        );
+        
+        // Convertir la lista de productos en una lista de ProductoRequest
+        return productos.stream()
+            .map(this::convertirAProductoRequest)
+            .collect(Collectors.toList());
     }
     
     
