@@ -1,5 +1,6 @@
 package com.uade.tpo.MarketPlace.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,10 +20,20 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
     private String marca;
+
+    @Column
     private String modelo;
+
+    @Column
     private int año;
+
+    @Column
     private double precio;
+
+    @Column
+    private int stock;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")

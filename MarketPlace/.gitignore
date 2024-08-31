@@ -32,5 +32,8 @@ build/
 ### VS Code ###
 .vscode/
 
-###no subir contraseñas###
-/src/main/resources/application.properties
+
+# Ignorar el archivo application.properties
+src/main/resources/application.properties
+
+
