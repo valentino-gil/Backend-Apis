@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.uade.tpo.MarketPlace.entity.Producto;
+import com.uade.tpo.MarketPlace.entity.dto.FiltroProducto;
 import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
 import com.uade.tpo.MarketPlace.service.ProductoService;
 
@@ -35,4 +37,9 @@ public class ProductoController {
         List<ProductoRequest> productos = productoService.obtenerProductos();
         return ResponseEntity.ok(productos);
     }
+
+    @GetMapping("/all/filtrar")
+public List<ProductoRequest> filtrarProductos(FiltroProducto filtro) {
+    return productoService.filtrarProductos(filtro);
+}
 }

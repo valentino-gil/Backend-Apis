@@ -27,7 +27,7 @@ public class ProductoServiceImpl implements ProductoService {
 
         // Verificamos si el auto ya fue registrado por el usuario
         if (productoRepository.existsByMarcaAndModeloAndUsuarioId(
-                productoRequest.getMarca(), productoRequest.getModelo(), usuarioId)) {
+                productoRequest.getMarca(), productoRequest.getModelo(), usuarioId, productoRequest.getAño())) {
             throw new IllegalArgumentException("El usuario ya tiene registrado un auto de esta marca y modelo");
         }
 
@@ -38,28 +38,29 @@ public class ProductoServiceImpl implements ProductoService {
         producto.setAño(productoRequest.getAño());
         producto.setPrecio(productoRequest.getPrecio());
         producto.setUsuario(usuario);
+        producto.setStock(productoRequest.getStock());
         productoRepository.save(producto);
 
+        return convertirAProductoRequest(producto);
+                
+    }
+
+    
+    public List<ProductoRequest> obtenerProductos() {
+        List<Producto> productos = productoRepository.findAll();
+    return productos.stream()
+        .map(producto -> convertirAProductoRequest(producto))
+        .collect(Collectors.toList());
+    }
+
+    private ProductoRequest convertirAProductoRequest(Producto producto) {
         return new ProductoRequest(
                 producto.getId(),
                 producto.getMarca(),
                 producto.getModelo(),
                 producto.getAño(),
                 producto.getPrecio(),
-                producto.getUsuario().getId()); // Devolvemos el DTO con usuarioId
-    }
-
-    
-    public List<ProductoRequest> obtenerProductos() {
-        List<Producto> productos = productoRepository.findAll();
-        return productos.stream()
-            .map(producto -> new ProductoRequest(
-                    producto.getId(),
-                    producto.getMarca(),
-                    producto.getModelo(),
-                    producto.getAño(),
-                    producto.getPrecio(),
-                    producto.getUsuario().getId())) // Mapea el producto a ProductoRequest
-            .collect(Collectors.toList());
+                producto.getStock(),
+                producto.getUsuario().getId());
     }
 }
