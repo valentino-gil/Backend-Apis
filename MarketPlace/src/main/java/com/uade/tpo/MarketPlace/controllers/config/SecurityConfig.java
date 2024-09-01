@@ -2,6 +2,7 @@ package com.uade.tpo.MarketPlace.controllers.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,6 +35,10 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/producto/all/**").permitAll()
                                                 //.requestMatchers("/categories/**").hasAnyAuthority(Role.USER.name())
                                                 .requestMatchers("/api/producto/**").hasAuthority(Role.Vendedor.name())
+                                                // Solo compradores pueden agregar calificaciones
+                                                .requestMatchers(HttpMethod.POST, "/api/calificacion/**").hasAuthority(Role.Comprador.name())
+                                                // Solo vendedores pueden obtener calificaciones
+                                                .requestMatchers(HttpMethod.GET, "/api/calificacion/**").hasAuthority(Role.Vendedor.name())
                                                 .anyRequest()
                                                 .authenticated())
                                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
