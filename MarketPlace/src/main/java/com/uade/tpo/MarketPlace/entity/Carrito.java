@@ -6,8 +6,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class Carrito {
+@Data
 
+public class Carrito {
+    
     @ManyToOne
     @JoinColumn(name="producto_id")
     private Producto producto;
@@ -18,4 +20,6 @@ public class Carrito {
     @ManyToOne
     @JoinColumn(name="usuario_id")
     private Usuario usuario;
+
+    
 }
