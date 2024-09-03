@@ -67,7 +67,9 @@ public class Usuario implements UserDetails{
     @Enumerated(EnumType.STRING)
     private NivelVendedor nivel = NivelVendedor.Bajo; //nivel inicial por defecto
     
+
     
+
     //-----------------------------------------------------
     @ManyToMany
     @JoinTable(
@@ -76,6 +78,7 @@ public class Usuario implements UserDetails{
         inverseJoinColumns = @JoinColumn(name = "producto_id")
     )
     private List<Producto> wishlist = new ArrayList<>();
+
 
    
     //-----------------------------------------------------------------------

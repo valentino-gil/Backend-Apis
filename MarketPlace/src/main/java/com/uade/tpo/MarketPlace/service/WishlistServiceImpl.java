@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class WishlistServiceImpl implements WishlistService {
 
 
+
         private final UsuarioRepository usuarioRepository;
         private final ProductoRepository productoRepository;
 
@@ -77,15 +78,18 @@ public class WishlistServiceImpl implements WishlistService {
             }
             
 
-        private ProductoRequest convertirAProductoRequest(Producto producto) {
-                return new ProductoRequest(
-                        producto.getId(),
-                        producto.getMarca(),
-                        producto.getModelo(),
-                        producto.getAño(),
-                        producto.getPrecio(),
-                        producto.getStock(),
-                        producto.getUsuario().getId()); // Devolvemos el DTO con usuarioId
-        }
+       
+
+    private ProductoRequest convertirAProductoRequest(Producto producto) {
+        return new ProductoRequest(
+                producto.getId(),
+                producto.getMarca(),
+                producto.getModelo(),
+                producto.getAño(),
+                producto.getPrecio(),
+                producto.getStock(),
+                producto.getUsuario().getId()); // Devolvemos el DTO con usuarioId
+    }
+
 
 }

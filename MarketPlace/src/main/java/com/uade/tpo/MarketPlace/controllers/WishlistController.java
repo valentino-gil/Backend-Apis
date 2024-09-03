@@ -19,6 +19,7 @@ public class WishlistController {
     @Autowired
     private WishlistService wishlistService;
 
+
     @PostMapping("/{productoId}")
     public ResponseEntity<?> agregarProductoAWishlist(@PathVariable Long productoId, Authentication authentication) {
         String emailUsuario = authentication.getName(); // El email del usuario autenticado
@@ -33,11 +34,16 @@ public class WishlistController {
     }
 
 
+
+    
+
+
     @GetMapping
     public List<ProductoRequest> obtenerWishlist(Authentication authentication) {
         String emailUsuario = authentication.getName();
         return wishlistService.obtenerWishlist(emailUsuario);
     }
+
 
     @DeleteMapping("/{productoId}")
 public ResponseEntity<?> eliminarProductoDeWishlist(@PathVariable Long productoId, Authentication authentication) {
@@ -53,3 +59,7 @@ public ResponseEntity<?> eliminarProductoDeWishlist(@PathVariable Long productoI
 }
 
 }
+
+    
+
+
