@@ -67,6 +67,9 @@ public class Usuario implements UserDetails{
     @Enumerated(EnumType.STRING)
     private NivelVendedor nivel = NivelVendedor.Bajo; //nivel inicial por defecto
     
+
+    
+
     //-----------------------------------------------------
     @ManyToMany
     @JoinTable(
@@ -76,14 +79,8 @@ public class Usuario implements UserDetails{
     )
     private List<Producto> wishlist = new ArrayList<>();
 
-    // Getters y Setters para wishlist
-    public List<Producto> getWishlist() {
-        return wishlist;
-    }
 
-    public void setWishlist(List<Producto> wishlist) {
-        this.wishlist = wishlist;
-    }
+   
     //-----------------------------------------------------------------------
     
     @Override

@@ -19,14 +19,24 @@ public class WishlistController {
     @Autowired
     private WishlistService wishlistService;
 
-    @PostMapping("/agregar/{productoId}")
-    public ResponseEntity<ProductoRequest> agregarProductoAWishlist(@PathVariable Long productoId, Authentication authentication) {
-    String emailUsuario = authentication.getName(); // El email del usuario autenticado
+
+    @PostMapping("/{productoId}")
+    public ResponseEntity<?> agregarProductoAWishlist(@PathVariable Long productoId, Authentication authentication) {
+        String emailUsuario = authentication.getName(); // El email del usuario autenticado
     
-    ProductoRequest result = wishlistService.agregarProductoAWishlist(productoId, emailUsuario); // Usa la instancia de wishlistService
-    return ResponseEntity.ok(result);
-    
+        try {
+            ProductoRequest result = wishlistService.agregarProductoAWishlist(productoId, emailUsuario); // Usa la instancia de wishlistService
+            return ResponseEntity.ok(result);
+        } catch (RuntimeException e) {
+            // Si ocurre una excepción, devolver un código de estado 400 (Bad Request) con el mensaje de error
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
+
+
+
+    
+
 
     @GetMapping
     public List<ProductoRequest> obtenerWishlist(Authentication authentication) {
@@ -34,10 +44,22 @@ public class WishlistController {
         return wishlistService.obtenerWishlist(emailUsuario);
     }
 
-    @DeleteMapping("/eliminar/{productoId}")
-    public ResponseEntity<?> eliminarProductoDeWishlist(@PathVariable Long productoId, Authentication authentication) {
-        String emailUsuario = authentication.getName();
+
+    @DeleteMapping("/{productoId}")
+public ResponseEntity<?> eliminarProductoDeWishlist(@PathVariable Long productoId, Authentication authentication) {
+    String emailUsuario = authentication.getName();
+
+    try {
         wishlistService.eliminarProductoDeWishlist(productoId, emailUsuario);
         return ResponseEntity.ok().body("Producto eliminado de la lista de favoritos");
+    } catch (RuntimeException e) {
+        // Manejar la excepción y devolver el mensaje de error
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
+
+}
+
+    
+
+

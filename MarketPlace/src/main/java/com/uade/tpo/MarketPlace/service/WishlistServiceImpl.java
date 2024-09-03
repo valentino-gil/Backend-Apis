@@ -15,53 +15,70 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WishlistServiceImpl implements WishlistService {
 
-    private final UsuarioRepository usuarioRepository;
-    private final ProductoRepository productoRepository;
 
-    @Override
-    public ProductoRequest agregarProductoAWishlist(Long productoId, String emailUsuario) {
-        Usuario usuario = usuarioRepository.findByMail(emailUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        Producto producto = productoRepository.findById(productoId)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        private final UsuarioRepository usuarioRepository;
+        private final ProductoRepository productoRepository;
 
-        usuario.getWishlist().add(producto);
-        usuarioRepository.save(usuario);
-        return convertirAProductoRequest(producto);
 
-        
-    }
+        public ProductoRequest agregarProductoAWishlist(Long productoId, String emailUsuario) {
+                Usuario usuario = usuarioRepository.findByMail(emailUsuario)
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-    @Override
-    public List<ProductoRequest> obtenerWishlist(String emailUsuario) {
-        Usuario usuario = usuarioRepository.findByMail(emailUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                Producto producto = productoRepository.findById(productoId)
+                        .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-        return usuario.getWishlist().stream()
-                .map(producto -> new ProductoRequest(
-                        producto.getId(),
-                        producto.getMarca(),
-                        producto.getModelo(),
-                        producto.getAño(),
-                        producto.getPrecio(),
-                        producto.getStock(),
-                        usuario.getId()
-                ))
-                .collect(Collectors.toList());
-    }
+                // Verificar si el producto ya está en la wishlist del usuario
+                if (usuario.getWishlist().contains(producto)) {
+                        throw new RuntimeException("El producto ya está en la wishlist");
+                }
 
-    @Override
-    public void eliminarProductoDeWishlist(Long productoId, String emailUsuario) {
-        Usuario usuario = usuarioRepository.findByMail(emailUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                // Si no está, agregarlo a la wishlist
+                usuario.getWishlist().add(producto);
+                usuarioRepository.save(usuario);
 
-        Producto producto = productoRepository.findById(productoId)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                return convertirAProductoRequest(producto);
+        }
 
-        usuario.getWishlist().remove(producto);
-        usuarioRepository.save(usuario);
-    }
+
+    
+        public List<ProductoRequest> obtenerWishlist(String emailUsuario) {
+                Usuario usuario = usuarioRepository.findByMail(emailUsuario)
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+                return usuario.getWishlist().stream()
+                        .map(producto -> new ProductoRequest(
+                                producto.getId(),
+                                producto.getMarca(),
+                                producto.getModelo(),
+                                producto.getAño(),
+                                producto.getPrecio(),
+                                producto.getStock(),
+                                usuario.getId()
+                        ))
+                        .collect(Collectors.toList());
+        }
+
+    
+        public void eliminarProductoDeWishlist(Long productoId, String emailUsuario) {
+                Usuario usuario = usuarioRepository.findByMail(emailUsuario)
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            
+                Producto producto = productoRepository.findById(productoId)
+                        .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            
+                // Verificar si el producto está en la wishlist
+                if (!usuario.getWishlist().contains(producto)) {
+                    throw new RuntimeException("El producto no existe en la wishlist");
+                }
+            
+                // Eliminar el producto de la wishlist
+                usuario.getWishlist().remove(producto);
+                usuarioRepository.save(usuario);
+            }
+            
+
+       
 
     private ProductoRequest convertirAProductoRequest(Producto producto) {
         return new ProductoRequest(
@@ -73,5 +90,6 @@ public class WishlistServiceImpl implements WishlistService {
                 producto.getStock(),
                 producto.getUsuario().getId()); // Devolvemos el DTO con usuarioId
     }
+
 
 }
