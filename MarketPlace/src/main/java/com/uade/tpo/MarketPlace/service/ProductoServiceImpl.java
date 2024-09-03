@@ -48,11 +48,12 @@ public class ProductoServiceImpl implements ProductoService {
 
     
     public List<ProductoRequest> obtenerProductos() {
-        List<Producto> productos = productoRepository.findAll();
-    return productos.stream()
-        .map(producto -> convertirAProductoRequest(producto))
-        .collect(Collectors.toList());
+        List<Producto> productos = productoRepository.findAllOrderByVendedorNivelDesc();
+        return productos.stream()
+            .map(producto -> convertirAProductoRequest(producto))
+            .collect(Collectors.toList());
     }
+    
 
     private ProductoRequest convertirAProductoRequest(Producto producto) {
         return new ProductoRequest(
