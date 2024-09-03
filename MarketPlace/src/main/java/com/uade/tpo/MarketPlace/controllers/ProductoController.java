@@ -42,13 +42,6 @@ public class ProductoController {
 
     // Método para registrar un producto
 
-    @PostMapping("/{usuarioId}")
-    public ResponseEntity<ProductoRequest> registrarProducto(@PathVariable Long usuarioId, @RequestBody ProductoRequest productoRequest) {
-        ProductoRequest result = productoService.registrarProducto(usuarioId, productoRequest);
-        return ResponseEntity.created(URI.create("/productos/" + result.getId())).body(result);
-    }
-
-
     @PostMapping
 public ResponseEntity<ProductoRequest> registrarProducto(@RequestBody ProductoRequest productoRequest, 
                                                          @AuthenticationPrincipal UserDetails userDetails) {
