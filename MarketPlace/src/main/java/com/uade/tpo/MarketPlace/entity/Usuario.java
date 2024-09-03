@@ -2,6 +2,7 @@ package com.uade.tpo.MarketPlace.entity;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,6 +15,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,7 +66,19 @@ public class Usuario implements UserDetails{
 
     @Enumerated(EnumType.STRING)
     private NivelVendedor nivel = NivelVendedor.Bajo; //nivel inicial por defecto
+    
+    
+    //-----------------------------------------------------
+    @ManyToMany
+    @JoinTable(
+        name = "usuario_wishlist",
+        joinColumns = @JoinColumn(name = "usuario_id"),
+        inverseJoinColumns = @JoinColumn(name = "producto_id")
+    )
+    private List<Producto> wishlist = new ArrayList<>();
 
+   
+    //-----------------------------------------------------------------------
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

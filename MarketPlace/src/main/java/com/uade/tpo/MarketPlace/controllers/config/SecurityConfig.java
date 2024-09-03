@@ -39,6 +39,8 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.POST, "/api/calificacion/**").hasAuthority(Role.Comprador.name())
                                                 // Solo vendedores pueden obtener calificaciones
                                                 .requestMatchers(HttpMethod.GET, "/api/calificacion/**").hasAuthority(Role.Vendedor.name())
+                                                //
+                                                .requestMatchers("/api/wishlist/**").authenticated()
                                                 .anyRequest()
                                                 .authenticated())
                                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
