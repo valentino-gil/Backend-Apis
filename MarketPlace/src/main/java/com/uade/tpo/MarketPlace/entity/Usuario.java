@@ -60,6 +60,9 @@ public class Usuario implements UserDetails{
     @OneToMany(mappedBy = "comprador")
     private List<Calificacion> calificacionesRealizadas;
 
+    @Enumerated(EnumType.STRING)
+    private NivelVendedor nivel = NivelVendedor.Bajo; //nivel inicial por defecto
+
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
