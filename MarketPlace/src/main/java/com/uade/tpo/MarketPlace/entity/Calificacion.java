@@ -11,31 +11,22 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Producto {
-    public Producto(){
-        
-    }
-    //dada
+public class Calificacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private String marca;
-
-    @Column
-    private String modelo;
-
-    @Column
-    private int año;
-
-    @Column
-    private double precio;
-
-    @Column(nullable = false)
-    private Integer stock = 1;
+    @ManyToOne
+    @JoinColumn(name = "comprador_id", nullable = false)
+    private Usuario comprador;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
+    @JoinColumn(name = "vendedor_id", nullable = false)
+    private Usuario vendedor;
+
+    @Column(nullable = false)
+    private int puntaje; // Calificación del 1 al 5
+
+    @Column
+    private String comentario;
 }

@@ -2,6 +2,15 @@ package com.uade.tpo.MarketPlace.controllers;
 
 import java.net.URI;
 import java.util.List;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +32,16 @@ import com.uade.tpo.MarketPlace.service.ProductoService;
 @RequestMapping("api/producto")
 public class ProductoController {
 
-
     
 
     @Autowired
     private UsuarioRepository UsuarioRepository;
+
     @Autowired
     private ProductoService productoService;
 
     // Método para registrar un producto
+
     @PostMapping
 public ResponseEntity<ProductoRequest> registrarProducto(@RequestBody ProductoRequest productoRequest, 
                                                          @AuthenticationPrincipal UserDetails userDetails) {
@@ -56,12 +66,14 @@ public ResponseEntity<ProductoRequest> registrarProducto(@RequestBody ProductoRe
     return ResponseEntity.created(URI.create("/productos/" + result.getId())).body(result);
 }
 
+
     // Método para obtener todos los productos
     @GetMapping("/all")
     public ResponseEntity<List<ProductoRequest>> obtenerProductos() {
         List<ProductoRequest> productos = productoService.obtenerProductos();
         return ResponseEntity.ok(productos);
     }
+
 
 
     @GetMapping("/all/filtrar")
@@ -83,6 +95,7 @@ public ResponseEntity<List<ProductoRequest>> filtrarProductos(
 }
 
 
+
     // Método para eliminar un producto
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminarProducto(@PathVariable Long id, Authentication authentication) {
@@ -102,5 +115,6 @@ public ResponseEntity<List<ProductoRequest>> filtrarProductos(
     }
 
 }
+
 
 

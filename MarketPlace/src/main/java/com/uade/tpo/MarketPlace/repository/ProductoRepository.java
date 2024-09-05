@@ -28,4 +28,8 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
         @Param("añoMax") Integer añoMax
     
     );
+
+    @Query("SELECT p FROM Producto p JOIN p.usuario v ORDER BY v.nivel ASC")
+    List<Producto> findAllOrderByVendedorNivelDesc();
+
 }

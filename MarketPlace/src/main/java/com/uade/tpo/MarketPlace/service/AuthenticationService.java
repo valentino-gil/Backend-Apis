@@ -6,11 +6,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+//
 import com.uade.tpo.MarketPlace.controllers.auth.AuthenticationRequest;
 import com.uade.tpo.MarketPlace.controllers.auth.AuthenticationResponse;
 import com.uade.tpo.MarketPlace.controllers.auth.RegisterRequest;
 import com.uade.tpo.MarketPlace.controllers.config.JwtService;
+import com.uade.tpo.MarketPlace.entity.NivelVendedor;
 import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
 
@@ -32,6 +33,7 @@ public class AuthenticationService {
                                 .Contraseña(passwordEncoder.encode(request.getContraseña()))
                                 .role(request.getRole())
                                 .NombreUsuario(request.getNombreUsuario())
+                                .nivel(NivelVendedor.Bajo)
                                 .build();
 
                 repository.save(user);
