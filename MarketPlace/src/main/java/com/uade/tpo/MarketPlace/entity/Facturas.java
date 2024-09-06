@@ -1,5 +1,7 @@
 package com.uade.tpo.MarketPlace.entity;
 
+import java.sql.Date;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +20,10 @@ public class Facturas {
     private Long id;
 
     @Column
-    private int monto;
+    private double monto;
+
+    @Column
+    private Date fecha;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")

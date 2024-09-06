@@ -21,7 +21,7 @@ public class ItemsFactura {
     private int cantidad;
 
     @Column
-    private int monto;
+    private double monto;
 
     @ManyToOne
     @JoinColumn (name = "producto_id")
