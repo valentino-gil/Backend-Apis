@@ -1,10 +1,15 @@
 package com.uade.tpo.MarketPlace.service;
 
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.sql.rowset.serial.SerialBlob;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.uade.tpo.MarketPlace.entity.Producto;
 import com.uade.tpo.MarketPlace.entity.Usuario;
@@ -13,8 +18,11 @@ import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
 import com.uade.tpo.MarketPlace.repository.ProductoRepository;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
 
+import io.jsonwebtoken.io.IOException;
+
 @Service
 public class ProductoServiceImpl implements ProductoService {
+
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -22,17 +30,10 @@ public class ProductoServiceImpl implements ProductoService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    public ProductoRequest registrarProducto(Long usuarioId, ProductoRequest productoRequest) {
+    public ProductoRequest registrarProducto(Long usuarioId, ProductoRequest productoRequest, Blob imagenBlob) throws IOException, SQLException {
         Usuario usuario = usuarioRepository.findById(usuarioId)
-            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-
-        // Verificamos si el auto ya fue registrado por el usuario
-        if (productoRepository.existsByMarcaAndModeloAndUsuarioId(
-                productoRequest.getMarca(), productoRequest.getModelo(), usuarioId, productoRequest.getAño())) {
-            throw new IllegalArgumentException("El usuario ya tiene registrado un auto de esta marca y modelo");
-        }
-
-        // Creamos el auto y lo asignamos al usuario
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+    
         Producto producto = new Producto();
         producto.setMarca(productoRequest.getMarca());
         producto.setModelo(productoRequest.getModelo());
@@ -40,11 +41,20 @@ public class ProductoServiceImpl implements ProductoService {
         producto.setPrecio(productoRequest.getPrecio());
         producto.setUsuario(usuario);
         producto.setStock(productoRequest.getStock());
+        producto.setDescripcion(productoRequest.getDescripcion());
+        producto.setKm(productoRequest.getKm());
+    
+        // Asignar Blob si está disponible
+        if (imagenBlob != null && imagenBlob.length() > 0) {
+            producto.setImagen(imagenBlob);
+        }
+    
         productoRepository.save(producto);
-
         return convertirAProductoRequest(producto);
-                
     }
+    
+    
+    
 
     
     public List<ProductoRequest> obtenerProductos() {
@@ -63,7 +73,11 @@ public class ProductoServiceImpl implements ProductoService {
                 producto.getAño(),
                 producto.getPrecio(),
                 producto.getStock(),
+                producto.getDescripcion(),
+                producto.getKm(),
+                producto.getImagen(),
                 producto.getUsuario().getId()); // Devolvemos el DTO con usuarioId
+                
     }
     public boolean eliminarProducto(Long id, String usuarioActual) {
         Producto producto = productoRepository.findById(id)
@@ -102,6 +116,44 @@ public class ProductoServiceImpl implements ProductoService {
             .map(this::convertirAProductoRequest)
             .collect(Collectors.toList());
     }
+    
+    public ProductoRequest actualizarProducto(Long id, ProductoRequest productoRequest, String emailUsuario) {
+        // Buscar el producto
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+    
+        // Buscar el usuario autenticado
+        Usuario usuario = usuarioRepository.findBymail(emailUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    
+        // Verificar si el usuario es el propietario del producto
+        if (!producto.getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("No tienes permiso para actualizar este producto");
+        }
+    
+        // Actualizar solo los atributos que no sean nulos
+        if (productoRequest.getMarca() != null) {
+            producto.setMarca(productoRequest.getMarca());
+        }
+        if (productoRequest.getModelo() != null) {
+            producto.setModelo(productoRequest.getModelo());
+        }
+        if (productoRequest.getAño() != 0) {
+            producto.setAño(productoRequest.getAño());
+        }
+        if (productoRequest.getPrecio() != 0.0) {
+            producto.setPrecio(productoRequest.getPrecio());
+        }
+        if (productoRequest.getStock() != null) {
+            producto.setStock(productoRequest.getStock());
+        }
+    
+        // Guardar los cambios en la base de datos
+        productoRepository.save(producto);
+    
+        return convertirAProductoRequest(producto);
+    }
+    
     
     
 

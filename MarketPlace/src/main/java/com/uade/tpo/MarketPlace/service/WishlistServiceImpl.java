@@ -54,6 +54,9 @@ public class WishlistServiceImpl implements WishlistService {
                                 producto.getAño(),
                                 producto.getPrecio(),
                                 producto.getStock(),
+                                producto.getDescripcion(),
+                                producto.getKm(),
+                                producto.getImagen(),
                                 usuario.getId()
                         ))
                         .collect(Collectors.toList());
@@ -88,6 +91,9 @@ public class WishlistServiceImpl implements WishlistService {
                 producto.getAño(),
                 producto.getPrecio(),
                 producto.getStock(),
+                producto.getDescripcion(),
+                producto.getKm(),
+                producto.getImagen(),
                 producto.getUsuario().getId()); // Devolvemos el DTO con usuarioId
     }
 
