@@ -1,5 +1,7 @@
 package com.uade.tpo.MarketPlace.entity;
 
+import java.sql.Blob;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,4 +40,13 @@ public class Producto {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
+
+    @Column
+    private String descripcion;
+    
+    @Column
+    private double km;
+
+    @Column
+    private Blob imagen;
 }
