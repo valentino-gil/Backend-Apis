@@ -2,6 +2,7 @@ package com.uade.tpo.MarketPlace.service;
 
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,19 +67,35 @@ public class ProductoServiceImpl implements ProductoService {
     
 
     private ProductoRequest convertirAProductoRequest(Producto producto) {
-        return new ProductoRequest(
-                producto.getId(),
-                producto.getMarca(),
-                producto.getModelo(),
-                producto.getAño(),
-                producto.getPrecio(),
-                producto.getStock(),
-                producto.getDescripcion(),
-                producto.getKm(),
-                producto.getImagen(),
-                producto.getUsuario().getId()); // Devolvemos el DTO con usuarioId
-                
+        ProductoRequest productoRequest = new ProductoRequest();
+        productoRequest.setId(producto.getId());
+        productoRequest.setMarca(producto.getMarca());
+        productoRequest.setModelo(producto.getModelo());
+        productoRequest.setAño(producto.getAño());
+        productoRequest.setPrecio(producto.getPrecio());
+        productoRequest.setStock(producto.getStock());
+        productoRequest.setDescripcion(producto.getDescripcion());
+        productoRequest.setKm(producto.getKm());
+        productoRequest.setUsuarioId(producto.getUsuario().getId());
+    
+        try {
+            String imagenBase64 = convertirBlobToBase64(producto.getImagen());
+            productoRequest.setImagen(imagenBase64);
+        } catch (IOException | SQLException e) {
+            e.printStackTrace(); // Manejo de errores según sea necesario
+        }
+    
+        return productoRequest;
     }
+    
+    
+
+
+    private String convertirBlobToBase64(Blob blob) throws IOException, SQLException {
+        byte[] imageBytes = blob.getBytes(1, (int) blob.length());
+        return Base64.getEncoder().encodeToString(imageBytes);
+    }
+    
     public boolean eliminarProducto(Long id, String usuarioActual) {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));

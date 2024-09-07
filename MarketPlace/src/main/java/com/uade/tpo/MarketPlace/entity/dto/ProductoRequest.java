@@ -16,14 +16,15 @@ public class ProductoRequest {
     private Integer stock;
     private String descripcion;
     private double km;
-    private Blob imagen;
+    private String imagen;
     private Long usuarioId;
      
-    
+    public ProductoRequest() {
+    }
     
 
     
-    public ProductoRequest(Long id, String marca, String modelo, int año, double precio, Integer stock, String descripcion,double km,Blob imagen,Long usuarioId) {
+    public ProductoRequest(Long id, String marca, String modelo, int año, double precio, Integer stock, String descripcion,double km,String imagen,Long usuarioId) {
         this.id = id;
         this.marca = marca;
         this.modelo = modelo;
