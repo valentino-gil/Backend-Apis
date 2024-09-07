@@ -1,6 +1,8 @@
 package com.uade.tpo.MarketPlace.controllers;
 
 import java.net.URI;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.List;
 
 
@@ -8,10 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
 
 import java.util.Optional;
+
+import javax.sql.rowset.serial.SerialBlob;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +33,8 @@ import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
 import com.uade.tpo.MarketPlace.service.ProductoService;
 
+import io.jsonwebtoken.io.IOException;
+
 @RestController
 @RequestMapping("api/producto")
 public class ProductoController {
@@ -43,28 +50,33 @@ public class ProductoController {
     // Método para registrar un producto
 
     @PostMapping
-public ResponseEntity<ProductoRequest> registrarProducto(@RequestBody ProductoRequest productoRequest, 
-                                                         @AuthenticationPrincipal UserDetails userDetails) {
-    // Obtener el nombre del usuario actual desde el token
+public ResponseEntity<ProductoRequest> registrarProducto(
+    @RequestPart("producto") ProductoRequest productoRequest,
+    @RequestPart("imagen") MultipartFile imagen,
+    @AuthenticationPrincipal UserDetails userDetails) throws IOException, SQLException, java.io.IOException {
+
+    Blob imagenBlob = convertirImagenToBlob(imagen);
     String usuarioActual = userDetails.getUsername();
     
-    
-    // Obtener el usuario desde el repositorio
     Optional<Usuario> usuarioOpt = UsuarioRepository.findBymail(usuarioActual);
-
     if (!usuarioOpt.isPresent()) {
-        // Manejar el caso en que el usuario no exista
-        
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // O cualquier respuesta que desees
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     Long usuarioId = usuarioOpt.get().getId();
-    if (productoRequest.getStock()==null){
-        productoRequest.setStock(1);
-    }
-    ProductoRequest result = productoService.registrarProducto(usuarioId, productoRequest);
+    ProductoRequest result = productoService.registrarProducto(usuarioId, productoRequest, imagenBlob);
     return ResponseEntity.created(URI.create("/productos/" + result.getId())).body(result);
 }
+
+private Blob convertirImagenToBlob(MultipartFile imagen) throws SQLException, IOException, java.io.IOException {
+    if (imagen != null && !imagen.isEmpty()) {
+        byte[] imagenBytes = imagen.getBytes();
+        return new SerialBlob(imagenBytes);
+    }
+    return null;
+}
+
+
 
 
     // Método para obtener todos los productos
@@ -113,6 +125,21 @@ public ResponseEntity<List<ProductoRequest>> filtrarProductos(
             return ResponseEntity.badRequest().body("Error al eliminar el producto: " + e.getMessage());
         }
     }
+
+    @PutMapping("/{id}")
+        public ResponseEntity<?> actualizarProducto(@PathVariable Long id, 
+                                                    @RequestBody ProductoRequest productoRequest, 
+                                                    Authentication authentication) {
+            String emailUsuario = authentication.getName();
+    
+            try {
+                ProductoRequest productoActualizado = productoService.actualizarProducto(id, productoRequest, emailUsuario);
+                return ResponseEntity.ok(productoActualizado);
+            } catch (RuntimeException e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+}
+
 
 }
 

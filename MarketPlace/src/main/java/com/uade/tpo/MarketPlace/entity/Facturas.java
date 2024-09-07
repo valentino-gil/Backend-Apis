@@ -1,6 +1,6 @@
 package com.uade.tpo.MarketPlace.entity;
 
-import java.sql.Blob;
+import java.sql.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,40 +13,19 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Producto {
-    public Producto(){
-        
-    }
-    //dada
+public class Facturas {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private String marca;
+    private double monto;
 
     @Column
-    private String modelo;
-
-    @Column
-    private int año;
-
-    @Column
-    private double precio;
-
-    @Column(nullable = false)
-    private Integer stock = 1;
+    private Date fecha;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
-
-    @Column
-    private String descripcion;
-    
-    @Column
-    private double km;
-
-    @Column
-    private Blob imagen;
 }
