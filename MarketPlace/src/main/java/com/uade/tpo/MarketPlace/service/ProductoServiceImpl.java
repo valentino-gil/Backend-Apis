@@ -14,6 +14,7 @@ import com.uade.tpo.MarketPlace.entity.Producto;
 import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.entity.dto.FiltroProducto;
 import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
+import com.uade.tpo.MarketPlace.exceptions.ProductoDuplicateException;
 import com.uade.tpo.MarketPlace.repository.ProductoRepository;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
 import io.jsonwebtoken.io.IOException;
@@ -28,28 +29,54 @@ public class ProductoServiceImpl implements ProductoService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    public ProductoRequest registrarProducto(Long usuarioId, ProductoRequest productoRequest, Blob imagenBlob) throws IOException, SQLException {
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-    
-        Producto producto = new Producto();
-        producto.setMarca(productoRequest.getMarca());
-        producto.setModelo(productoRequest.getModelo());
-        producto.setAño(productoRequest.getAño());
-        producto.setPrecio(productoRequest.getPrecio());
-        producto.setUsuario(usuario);
-        producto.setStock(productoRequest.getStock());
-        producto.setDescripcion(productoRequest.getDescripcion());
-        producto.setKm(productoRequest.getKm());
-    
-        // Asignar Blob si está disponible
-        if (imagenBlob != null && imagenBlob.length() > 0) {
-            producto.setImagen(imagenBlob);
-        }
-    
-        productoRepository.save(producto);
-        return convertirAProductoRequest(producto);
+    public ProductoRequest registrarProducto(Long usuarioId, ProductoRequest productoRequest, Blob imagenBlob) throws IOException, SQLException, ProductoDuplicateException {
+    // Verificar que el stock sea válido
+    if (productoRequest.getStock() <= 0) {
+        throw new IllegalArgumentException("Stock tiene que ser un número válido");
     }
+    if (productoRequest.getAño() < 1000 || productoRequest.getAño() > 2026) {
+        throw new IllegalArgumentException("Año Invalido");
+    }
+    // Buscar el usuario
+    Usuario usuario = usuarioRepository.findById(usuarioId)
+            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+    // Verificar si el producto ya existe
+    boolean productoExiste = productoRepository.existsByMarcaAndModeloAndUsuarioId(
+            productoRequest.getMarca(),
+            productoRequest.getModelo(),
+            usuarioId,
+            productoRequest.getAño()
+    );
+
+    if (productoExiste) {
+        throw new ProductoDuplicateException("El producto ya se encuentra registrado.");
+    }
+
+    // Crear nuevo producto
+    Producto producto = new Producto();
+    producto.setMarca(productoRequest.getMarca());
+    producto.setModelo(productoRequest.getModelo());
+    producto.setAño(productoRequest.getAño());
+    producto.setPrecio(productoRequest.getPrecio());
+    producto.setUsuario(usuario);
+    producto.setStock(productoRequest.getStock());
+    producto.setDescripcion(productoRequest.getDescripcion());
+    producto.setKm(productoRequest.getKm());
+
+    // Asignar Blob si está disponible
+    if (imagenBlob != null && imagenBlob.length() > 0) {
+        producto.setImagen(imagenBlob);
+    }
+
+    // Guardar el producto
+    productoRepository.save(producto);
+
+    // Convertir y devolver ProductoRequest
+    return convertirAProductoRequest(producto);
+}
+
+    
     
     
     
