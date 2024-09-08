@@ -24,7 +24,7 @@ public class FacturasRequest {
         this.monto = monto;
         this.fecha = fecha;
         this.usuario = usuario;
-    }
+    }    
     
     @Data
     public static class ItemRequest {

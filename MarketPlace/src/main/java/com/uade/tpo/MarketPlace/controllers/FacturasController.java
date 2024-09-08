@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +18,13 @@ import com.uade.tpo.MarketPlace.entity.Facturas;
 import com.uade.tpo.MarketPlace.entity.Role;
 import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest;
+import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest.ItemRequest;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
 import com.uade.tpo.MarketPlace.service.FacturasService;
+import com.uade.tpo.MarketPlace.service.ItemService;
+
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -30,6 +36,9 @@ public class FacturasController {
 
     @Autowired
     private UsuarioRepository UsuarioRepository;
+
+    @Autowired
+    private ItemService itemService;
 
     @PostMapping
     public ResponseEntity<Facturas> crearFactura(@RequestBody FacturasRequest facturaRequest, 
@@ -52,5 +61,16 @@ public class FacturasController {
         List<FacturasRequest> facturas = facturaService.obtenerFacturas(usuario);
         return ResponseEntity.ok(facturas);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<List<ItemRequest>> ObtenerItemsFactura(@PathVariable Long id,@AuthenticationPrincipal UserDetails userDetails) {
+        String usuarioActual = userDetails.getUsername();
+        Usuario usuario = UsuarioRepository.findByNombreUsuario(usuarioActual)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        List<ItemRequest> item = itemService.ObtenerItemsFactura(id, usuario);   
+        
+        return ResponseEntity.ok(item);
+    }
+    
     
 }

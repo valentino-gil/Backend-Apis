@@ -33,27 +33,25 @@ public class FacturasService {
         Facturas factura = new Facturas();
         factura.setFecha((java.sql.Date) new Date());
         factura.setMonto(0.0); // El monto se calculará más tarde
+        factura.setDescuento(0.0);
 
         factura.setUsuario(usuario);
 
-        // Guardar la factura
-        factura = facturaRepository.save(factura);
 
         // Procesar los ítems de la factura
         double montoTotal = 0.0;
-        boolean status = true;
         for (FacturasRequest.ItemRequest itemRequest : facturaRequest.getItems()) {
-            Producto producto = productoRepository.findById(itemRequest.getProductoId())
+            Producto producto = productoRepository.findById(itemRequest.getProductoId().getId())
                     .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
             if (itemRequest.getCantidad()> producto.getStock())
-                status = false;
+                new RuntimeException("Stock "+producto.getModelo()+" insuficiente");
         }
-        if (status == true){
+
             for (FacturasRequest.ItemRequest itemRequest : facturaRequest.getItems()) {
                 ItemsFactura item = new ItemsFactura();
                 item.setCantidad(itemRequest.getCantidad());
             
-                Producto producto = productoRepository.findById(itemRequest.getProductoId())
+                Producto producto = productoRepository.findById(itemRequest.getProductoId().getId())
                     .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
                 item.setProducto(producto);
                 item.setFactura(factura);
@@ -65,14 +63,21 @@ public class FacturasService {
                 itemsFacturaRepository.save(item);
             }
 
+            if(montoTotal>=500){
+                montoTotal=montoTotal*0.95;
+                factura.setDescuento(0.05);
+            }
+            else if(montoTotal>=1000){
+                montoTotal=montoTotal*0.90;
+                factura.setDescuento(0.10);
+            }
+
             // Actualizar el monto total de la factura
             factura.setMonto(montoTotal);
-            facturaRepository.save(factura);
-        }
-        else{
-            facturaRepository.delete(factura);
-        }
-        return factura;
+        
+            
+        return  facturaRepository.save(factura);
+
     }
 
     public List<FacturasRequest> obtenerFacturas(Usuario usuario){
@@ -86,6 +91,7 @@ public class FacturasService {
         return new FacturasRequest(
                 factura.getId(),
                 factura.getMonto(),
+                factura.getDescuento(),
                 factura.getFecha(),
                 factura.getUsuario()
         );
