@@ -1,9 +1,5 @@
 package com.uade.tpo.MarketPlace.entity.dto;
 
-import java.sql.Blob;
-
-import org.springframework.web.multipart.MultipartFile;
-
 import lombok.Data;
 
 @Data
@@ -16,15 +12,14 @@ public class ProductoRequest {
     private Integer stock;
     private String descripcion;
     private double km;
-    private String imagen;
+    private String Imagen; // Asegúrate de que el nombre sea consistente
     private Long usuarioId;
-     
-    public ProductoRequest() {
-    }
     
 
-    
-    public ProductoRequest(Long id, String marca, String modelo, int año, double precio, Integer stock, String descripcion,double km,String imagen,Long usuarioId) {
+    public ProductoRequest() {
+    }
+
+    public ProductoRequest(Long id, String marca, String modelo, int año, double precio, Integer stock, String descripcion, double km,String Imagen ,Long usuarioId) {
         this.id = id;
         this.marca = marca;
         this.modelo = modelo;
@@ -33,10 +28,8 @@ public class ProductoRequest {
         this.stock = stock;
         this.descripcion = descripcion;
         this.km = km;
-        this.imagen = imagen;
+        this.Imagen = Imagen;
         this.usuarioId = usuarioId;
-        
         
     }
 }
-

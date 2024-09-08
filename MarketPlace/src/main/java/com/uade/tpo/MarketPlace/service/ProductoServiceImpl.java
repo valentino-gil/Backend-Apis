@@ -4,21 +4,18 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
 import javax.sql.rowset.serial.SerialBlob;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.uade.tpo.MarketPlace.entity.Producto;
 import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.entity.dto.FiltroProducto;
 import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
 import com.uade.tpo.MarketPlace.repository.ProductoRepository;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
-
 import io.jsonwebtoken.io.IOException;
 
 @Service
@@ -76,14 +73,9 @@ public class ProductoServiceImpl implements ProductoService {
         productoRequest.setStock(producto.getStock());
         productoRequest.setDescripcion(producto.getDescripcion());
         productoRequest.setKm(producto.getKm());
+        productoRequest.setImagen("http://localhost:8080/api/producto/all/" + producto.getId() + "/imagen");
         productoRequest.setUsuarioId(producto.getUsuario().getId());
-    
-        try {
-            String imagenBase64 = convertirBlobToBase64(producto.getImagen());
-            productoRequest.setImagen(imagenBase64);
-        } catch (IOException | SQLException e) {
-            e.printStackTrace(); // Manejo de errores según sea necesario
-        }
+
     
         return productoRequest;
     }
@@ -171,7 +163,18 @@ public class ProductoServiceImpl implements ProductoService {
         return convertirAProductoRequest(producto);
     }
     
-    
-    
+    public byte[] obtenerImagenProducto(Long productoId) throws SQLException {
+        Optional<Producto> productoOpt = productoRepository.findById(productoId);
 
+        if (productoOpt.isPresent()) {
+            Producto producto = productoOpt.get();
+            Blob imagenBlob = producto.getImagen();
+
+            if (imagenBlob != null) {
+                return imagenBlob.getBytes(1, (int) imagenBlob.length());
+            }
+        }
+
+        return null; // O puedes lanzar una excepción si prefieres
+    }
 }

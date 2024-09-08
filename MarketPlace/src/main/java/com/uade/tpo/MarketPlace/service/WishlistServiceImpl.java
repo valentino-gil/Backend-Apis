@@ -61,9 +61,10 @@ public class WishlistServiceImpl implements WishlistService {
                     producto.getPrecio(),
                     producto.getStock(),
                     producto.getDescripcion(),
-                    producto.getKm(),
-                    obtenerImagenBase64(producto.getImagen()), // Usa el método auxiliar
+                    producto.getKm(),                  
+                    "http://localhost:8080/api/producto/all/" + producto.getId() + "/imagen",
                     usuario.getId()
+                    
             ))
             .collect(Collectors.toList());
 }
@@ -111,7 +112,7 @@ public class WishlistServiceImpl implements WishlistService {
                 }
                 
                 Long usuarioId = (producto.getUsuario() != null) ? producto.getUsuario().getId() : null;
-                String imagenBase64 = obtenerImagenBase64(producto.getImagen()); // Utiliza el método auxiliar
+                
             
                 return new ProductoRequest(
                         producto.getId(),
@@ -122,8 +123,10 @@ public class WishlistServiceImpl implements WishlistService {
                         producto.getStock(),
                         producto.getDescripcion(),
                         producto.getKm(),
-                        imagenBase64, // Usa el valor convertido a Base64
+                        "http://localhost:8080/api/producto/all/" + producto.getId() + "/imagen",
+                        
                         usuarioId // Usa el ID del usuario asociado
+                        
                 );
             }
             

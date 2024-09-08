@@ -16,4 +16,5 @@ public interface ProductoService {
     boolean eliminarProducto(Long id, String usuarioActual);
     public List<ProductoRequest> filtrarProductos(FiltroProducto filtro);
     public ProductoRequest actualizarProducto(Long id, ProductoRequest productoRequest, String emailUsuario);
+    public byte[] obtenerImagenProducto(Long productoId) throws SQLException;
 }

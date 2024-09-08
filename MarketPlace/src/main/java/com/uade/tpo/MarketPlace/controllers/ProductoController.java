@@ -1,39 +1,30 @@
 package com.uade.tpo.MarketPlace.controllers;
 
-import java.net.URI;
-import java.sql.Blob;
-import java.sql.SQLException;
-import java.util.List;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
-
-import java.util.Optional;
-
-import javax.sql.rowset.serial.SerialBlob;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
+import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
+import com.uade.tpo.MarketPlace.entity.dto.FiltroProducto;
 import com.uade.tpo.MarketPlace.entity.Producto;
 import com.uade.tpo.MarketPlace.entity.Usuario;
-import com.uade.tpo.MarketPlace.entity.dto.FiltroProducto;
-import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
 import com.uade.tpo.MarketPlace.service.ProductoService;
-
-import io.jsonwebtoken.io.IOException;
+import javax.sql.rowset.serial.SerialBlob;
+import java.io.IOException;
+import java.sql.Blob;
+import java.sql.SQLException;
+import java.net.URI;
+import java.net.http.HttpHeaders;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/producto")
@@ -138,6 +129,22 @@ public ResponseEntity<List<ProductoRequest>> filtrarProductos(
             } catch (RuntimeException e) {
                 return ResponseEntity.badRequest().body(e.getMessage());
             }
+}
+@GetMapping("/all/{productoId}/imagen")
+public ResponseEntity<byte[]> obtenerImagenProducto(@PathVariable Long productoId) {
+    try {
+        byte[] imagenBytes = productoService.obtenerImagenProducto(productoId);
+
+        if (imagenBytes != null) {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG) // Usa MediaType para el tipo de contenido
+                    .body(imagenBytes);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    } catch (SQLException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
 }
 
 
