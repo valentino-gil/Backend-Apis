@@ -19,6 +19,7 @@ import com.uade.tpo.MarketPlace.entity.Role;
 import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest;
 import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest.ItemRequest;
+import com.uade.tpo.MarketPlace.repository.FacturasRepository;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
 import com.uade.tpo.MarketPlace.service.FacturasService;
 import com.uade.tpo.MarketPlace.service.ItemService;
@@ -39,12 +40,13 @@ public class FacturasController {
     @Autowired
     private ItemService itemService;
 
+    @Autowired
+    private FacturasRepository facturasRepository;
+
     @PostMapping
     public ResponseEntity<Facturas> crearFactura(@RequestBody FacturasRequest facturaRequest, 
                                                     @AuthenticationPrincipal UserDetails userDetails) {
-        String usuarioActual = userDetails.getUsername();
-        Usuario usuario = UsuarioRepository.findByNombreUsuario(usuarioActual)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Usuario usuario = buscarUsuario(userDetails);
         if (usuario.getRole() != Role.Comprador){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -54,22 +56,27 @@ public class FacturasController {
 
     @GetMapping("/all")
     public ResponseEntity<List<FacturasRequest>> obtenerFacturasComprador(@AuthenticationPrincipal UserDetails userDetails) {
-        String usuarioActual = userDetails.getUsername();
-        Usuario usuario = UsuarioRepository.findByNombreUsuario(usuarioActual)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Usuario usuario = buscarUsuario(userDetails);
         List<FacturasRequest> facturas = facturaService.obtenerFacturas(usuario);
         return ResponseEntity.ok(facturas);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<List<ItemRequest>> ObtenerItemsFactura(@PathVariable Long id,@AuthenticationPrincipal UserDetails userDetails) {
-        String usuarioActual = userDetails.getUsername();
-        Usuario usuario = UsuarioRepository.findByNombreUsuario(usuarioActual)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        List<ItemRequest> item = itemService.ObtenerItemsFactura(id, usuario);   
-        
-        return ResponseEntity.ok(item);
+        Usuario usuario = buscarUsuario(userDetails);
+        boolean status = facturasRepository.existsFacturaUsuario(usuario.getId(), id);
+        if (status){
+            List<ItemRequest> item = itemService.ObtenerItemsFactura(id, usuario);
+            return ResponseEntity.ok(item);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
     
-    
+    private Usuario buscarUsuario(UserDetails userDetails){
+        String usuario = userDetails.getUsername();
+        return UsuarioRepository.findByNombreUsuario(usuario)
+        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    }
 }
