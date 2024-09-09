@@ -1,6 +1,7 @@
 package com.uade.tpo.MarketPlace.entity;
 
 import java.sql.Blob;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
 
 @Entity
@@ -49,4 +51,7 @@ public class Producto {
 
     @Column
     private Blob imagen;
+    
+    @OneToMany(mappedBy = "producto")
+    private List<ItemsFactura> items;
 }

@@ -18,7 +18,7 @@ import com.uade.tpo.MarketPlace.entity.Facturas;
 import com.uade.tpo.MarketPlace.entity.Role;
 import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest;
-import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest.ItemRequest;
+import com.uade.tpo.MarketPlace.entity.dto.ItemRequest;
 import com.uade.tpo.MarketPlace.repository.FacturasRepository;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
 import com.uade.tpo.MarketPlace.service.FacturasService;
@@ -76,7 +76,7 @@ public class FacturasController {
     
     private Usuario buscarUsuario(UserDetails userDetails){
         String usuario = userDetails.getUsername();
-        return UsuarioRepository.findByNombreUsuario(usuario)
+        return UsuarioRepository.findByMail(usuario)
         .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
 }

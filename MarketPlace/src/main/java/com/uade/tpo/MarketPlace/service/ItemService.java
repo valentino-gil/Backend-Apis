@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.MarketPlace.entity.ItemsFactura;
 import com.uade.tpo.MarketPlace.entity.Usuario;
-import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest.ItemRequest;
+import com.uade.tpo.MarketPlace.entity.dto.ItemRequest;
 import com.uade.tpo.MarketPlace.repository.ItemsFacturaRepository;
 
 @Service
@@ -27,7 +27,7 @@ public class ItemService {
 
     private ItemRequest convertirAItemRequest(ItemsFactura item) {
         return new ItemRequest(
-                item.getProducto(),
+                item.getProducto().getId(),
                 item.getCantidad(),
                 item.getMonto(),
                 item.getId(),

@@ -6,7 +6,7 @@ import java.util.List;
 import com.uade.tpo.MarketPlace.entity.Facturas;
 import com.uade.tpo.MarketPlace.entity.Producto;
 import com.uade.tpo.MarketPlace.entity.Usuario;
-
+import com.uade.tpo.MarketPlace.entity.dto.ItemRequest;
 import lombok.Data;
 
 @Data
@@ -30,27 +30,8 @@ public class FacturasRequest {
         this.usuario = usuario;
     }
     
-    @Data
-    public static class ItemRequest {
-        private Producto productoId;
-        private int cantidad;
-        private double monto;
-        private Long Id;
-        private Facturas facturaId;
-
-        public ItemRequest(Producto productoId, int cantidad){
-            this.productoId = productoId;
-            this.cantidad = cantidad;
-        }
-
-        public ItemRequest(Producto productoId, int cantidad, double monto, Long id, Facturas facturaId){
-            this.productoId = productoId;
-            this.cantidad = cantidad;
-            this.monto = monto;
-            this.Id = id;
-            this.facturaId = facturaId;
-        }
-    }
-
-
+    
 }
+
+
+

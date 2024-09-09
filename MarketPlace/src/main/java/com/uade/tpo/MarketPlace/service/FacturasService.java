@@ -15,6 +15,7 @@ import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest;
 import com.uade.tpo.MarketPlace.repository.FacturasRepository;
 import com.uade.tpo.MarketPlace.repository.ItemsFacturaRepository;
 import com.uade.tpo.MarketPlace.repository.ProductoRepository;
+import com.uade.tpo.MarketPlace.entity.dto.ItemRequest;
 
 @Service
 public class FacturasService {
@@ -31,54 +32,61 @@ public class FacturasService {
     public Facturas crearFactura(FacturasRequest facturaRequest, Usuario usuario) {
         // Crear la nueva factura
         Facturas factura = new Facturas();
-        factura.setFecha((java.sql.Date) new Date());
+        factura.setFecha(new java.sql.Date(System.currentTimeMillis()));
         factura.setMonto(0.0); // El monto se calculará más tarde
         factura.setDescuento(0.0);
-
         factura.setUsuario(usuario);
-
-
+    
+        // Guardar la factura primero
+        Facturas facturaGuardada = facturaRepository.save(factura);
+    
         // Procesar los ítems de la factura
         double montoTotal = 0.0;
-        for (FacturasRequest.ItemRequest itemRequest : facturaRequest.getItems()) {
-            Producto producto = productoRepository.findById(itemRequest.getProductoId().getId())
+    
+        // Validar el stock de todos los productos antes de continuar
+        for (ItemRequest itemRequest : facturaRequest.getItems()) {
+            Producto producto = productoRepository.findById(itemRequest.getProductoId())
                     .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-            if (itemRequest.getCantidad()> producto.getStock())
-                new RuntimeException("Stock "+producto.getModelo()+" insuficiente");
+    
+            if (itemRequest.getCantidad() > producto.getStock()) {
+                throw new RuntimeException("Stock insuficiente para el producto: " + producto.getModelo());
+            }
         }
-
-            for (FacturasRequest.ItemRequest itemRequest : facturaRequest.getItems()) {
-                ItemsFactura item = new ItemsFactura();
-                item.setCantidad(itemRequest.getCantidad());
-            
-                Producto producto = productoRepository.findById(itemRequest.getProductoId().getId())
+    
+        // Crear los ítems de la factura y calcular el monto total
+        for (ItemRequest itemRequest : facturaRequest.getItems()) {
+            ItemsFactura item = new ItemsFactura();
+            item.setCantidad(itemRequest.getCantidad());
+    
+            Producto producto = productoRepository.findById(itemRequest.getProductoId())
                     .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-                item.setProducto(producto);
-                item.setFactura(factura);
-            
-                double montoItem = producto.getPrecio() * itemRequest.getCantidad();
-                item.setMonto(montoItem);
-
-                montoTotal += montoItem;
-                itemsFacturaRepository.save(item);
-            }
-
-            if(montoTotal>=500){
-                montoTotal=montoTotal*0.95;
-                factura.setDescuento(0.05);
-            }
-            else if(montoTotal>=1000){
-                montoTotal=montoTotal*0.90;
-                factura.setDescuento(0.10);
-            }
-
-            // Actualizar el monto total de la factura
-            factura.setMonto(montoTotal);
-        
-            
-        return  facturaRepository.save(factura);
-
+    
+            item.setProducto(producto);
+            item.setFactura(facturaGuardada);
+    
+            double montoItem = producto.getPrecio() * itemRequest.getCantidad();
+            item.setMonto(montoItem);
+    
+            montoTotal += montoItem;
+            itemsFacturaRepository.save(item);
+        }
+    
+        // Aplicar descuentos
+        if (montoTotal >= 1000) {
+            montoTotal *= 0.90; // Descuento del 10%
+            facturaGuardada.setDescuento(0.10);
+        } else if (montoTotal >= 500) {
+            montoTotal *= 0.95; // Descuento del 5%
+            facturaGuardada.setDescuento(0.05);
+        }
+    
+        // Actualizar el monto total de la factura
+        facturaGuardada.setMonto(montoTotal);
+    
+        // Guardar la factura actualizada y devolverla
+        return facturaRepository.save(facturaGuardada);
     }
+    
 
     public List<FacturasRequest> obtenerFacturas(Usuario usuario){
         List<Facturas> facturas = facturaRepository.findAllFacturasUsuario(usuario.getId());
