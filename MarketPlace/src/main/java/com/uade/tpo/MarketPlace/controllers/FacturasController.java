@@ -18,7 +18,7 @@ import com.uade.tpo.MarketPlace.entity.Facturas;
 import com.uade.tpo.MarketPlace.entity.Role;
 import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest;
-import com.uade.tpo.MarketPlace.entity.dto.ItemRequest;
+import com.uade.tpo.MarketPlace.entity.dto.FiltroItemRequest;
 import com.uade.tpo.MarketPlace.repository.FacturasRepository;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
 import com.uade.tpo.MarketPlace.service.FacturasService;
@@ -62,11 +62,11 @@ public class FacturasController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<ItemRequest>> ObtenerItemsFactura(@PathVariable Long id,@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<List<FiltroItemRequest>> ObtenerItemsFactura(@PathVariable Long id,@AuthenticationPrincipal UserDetails userDetails) {
         Usuario usuario = buscarUsuario(userDetails);
         boolean status = facturasRepository.existsFacturaUsuario(usuario.getId(), id);
         if (status){
-            List<ItemRequest> item = itemService.ObtenerItemsFactura(id, usuario);
+            List<FiltroItemRequest> item = itemService.ObtenerItemsFactura(id, usuario);
             return ResponseEntity.ok(item);
         }
         else{

@@ -1,6 +1,5 @@
 package com.uade.tpo.MarketPlace.service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,10 +11,10 @@ import com.uade.tpo.MarketPlace.entity.ItemsFactura;
 import com.uade.tpo.MarketPlace.entity.Producto;
 import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest;
+import com.uade.tpo.MarketPlace.entity.dto.ItemRequest;
 import com.uade.tpo.MarketPlace.repository.FacturasRepository;
 import com.uade.tpo.MarketPlace.repository.ItemsFacturaRepository;
 import com.uade.tpo.MarketPlace.repository.ProductoRepository;
-import com.uade.tpo.MarketPlace.entity.dto.ItemRequest;
 
 @Service
 public class FacturasService {
@@ -42,25 +41,22 @@ public class FacturasService {
     
         // Procesar los ítems de la factura
         double montoTotal = 0.0;
-    
-        // Validar el stock de todos los productos antes de continuar
-        for (ItemRequest itemRequest : facturaRequest.getItems()) {
-            Producto producto = productoRepository.findById(itemRequest.getProductoId())
-                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-    
-            if (itemRequest.getCantidad() > producto.getStock()) {
-                throw new RuntimeException("Stock insuficiente para el producto: " + producto.getModelo());
-            }
-        }
+
     
         // Crear los ítems de la factura y calcular el monto total
         for (ItemRequest itemRequest : facturaRequest.getItems()) {
             ItemsFactura item = new ItemsFactura();
             item.setCantidad(itemRequest.getCantidad());
-    
+
             Producto producto = productoRepository.findById(itemRequest.getProductoId())
                     .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-    
+
+            if (producto.getStock() < itemRequest.getCantidad())
+                facturaRepository.delete(facturaGuardada);
+            else{
+                producto.setStock(producto.getStock()-itemRequest.getCantidad());
+                productoRepository.save(producto);
+            }
             item.setProducto(producto);
             item.setFactura(facturaGuardada);
     
@@ -101,7 +97,7 @@ public class FacturasService {
                 factura.getMonto(),
                 factura.getDescuento(),
                 factura.getFecha(),
-                factura.getUsuario()
+                factura.getUsuario().getId()
         );
     }
 }
