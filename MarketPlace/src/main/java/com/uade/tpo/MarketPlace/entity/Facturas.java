@@ -23,6 +23,9 @@ public class Facturas {
     private double monto;
 
     @Column
+    private double descuento;
+
+    @Column
     private Date fecha;
 
     @ManyToOne
