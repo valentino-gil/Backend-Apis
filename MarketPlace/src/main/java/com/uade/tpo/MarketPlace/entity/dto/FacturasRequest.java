@@ -12,11 +12,9 @@ public class FacturasRequest {
     private double descuento;
     private Date fecha;
     private Long usuario;
-    private List<ItemRequest> items;
+    
 
-    public FacturasRequest(List<ItemRequest> items){
-        this.items = items;
-    }
+    
 
     public FacturasRequest(Long id, double monto, double descuento, Date fecha, Long usuario){
         this.id = id;

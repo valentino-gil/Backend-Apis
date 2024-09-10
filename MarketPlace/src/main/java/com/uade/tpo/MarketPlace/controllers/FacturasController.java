@@ -19,6 +19,7 @@ import com.uade.tpo.MarketPlace.entity.Role;
 import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest;
 import com.uade.tpo.MarketPlace.entity.dto.FiltroItemRequest;
+import com.uade.tpo.MarketPlace.entity.dto.ItemRequest;
 import com.uade.tpo.MarketPlace.repository.FacturasRepository;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
 import com.uade.tpo.MarketPlace.service.FacturasService;
@@ -44,13 +45,13 @@ public class FacturasController {
     private FacturasRepository facturasRepository;
 
     @PostMapping
-    public ResponseEntity<Facturas> crearFactura(@RequestBody FacturasRequest facturaRequest, 
+    public ResponseEntity<FacturasRequest> crearFactura(@RequestBody List<ItemRequest> facturaRequest, 
                                                     @AuthenticationPrincipal UserDetails userDetails) {
         Usuario usuario = buscarUsuario(userDetails);
         if (usuario.getRole() != Role.Comprador){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        Facturas factura = facturaService.crearFactura(facturaRequest,usuario);
+        FacturasRequest factura = facturaService.crearFactura(facturaRequest,usuario);
         return ResponseEntity.ok(factura);
     }
 
