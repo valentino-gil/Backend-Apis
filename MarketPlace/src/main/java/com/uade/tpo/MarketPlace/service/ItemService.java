@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.MarketPlace.entity.ItemsFactura;
 import com.uade.tpo.MarketPlace.entity.Usuario;
-import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest.ItemRequest;
+import com.uade.tpo.MarketPlace.entity.dto.FiltroItemRequest;
 import com.uade.tpo.MarketPlace.repository.ItemsFacturaRepository;
 
 @Service
@@ -18,20 +18,19 @@ public class ItemService {
     private ItemsFacturaRepository itemsFacturaRepository;
 
 
-    public List<ItemRequest> ObtenerItemsFactura(Long id, Usuario usuario){
+    public List<FiltroItemRequest> ObtenerItemsFactura(Long id, Usuario usuario){
         List<ItemsFactura> items = itemsFacturaRepository.findAllItemsFactura(id);
         return items.stream()
-        .map(item -> convertirAItemRequest(item))
+        .map(item -> convertirAFiltroItemRequest(item))
         .collect(Collectors.toList());
     }
 
-    private ItemRequest convertirAItemRequest(ItemsFactura item) {
-        return new ItemRequest(
-                item.getProducto(),
+    private FiltroItemRequest convertirAFiltroItemRequest(ItemsFactura item) {
+        return new FiltroItemRequest(
+                item.getId(),
                 item.getCantidad(),
                 item.getMonto(),
-                item.getId(),
-                item.getFactura()
+                item.getProducto().getId()
         );
     }
     
