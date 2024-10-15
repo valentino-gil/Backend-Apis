@@ -1,7 +1,6 @@
 package com.uade.tpo.MarketPlace.entity.dto;
 
 import java.sql.Date;
-import java.util.List;
 
 import lombok.Data;
 
