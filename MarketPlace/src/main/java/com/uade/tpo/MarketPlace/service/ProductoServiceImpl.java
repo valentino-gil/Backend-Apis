@@ -202,6 +202,6 @@ public class ProductoServiceImpl implements ProductoService {
             }
         }
 
-        return null; // O puedes lanzar una excepción si prefieres
+        return null; 
     }
 }

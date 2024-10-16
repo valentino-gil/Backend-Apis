@@ -39,7 +39,7 @@ public class ProductoController {
     private ProductoService productoService;
 
     // Método para registrar un producto
-    @PostMapping
+    @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<?> registrarProducto(
         @RequestPart("producto") ProductoRequest productoRequest,
         @RequestPart("imagen") MultipartFile imagen,
