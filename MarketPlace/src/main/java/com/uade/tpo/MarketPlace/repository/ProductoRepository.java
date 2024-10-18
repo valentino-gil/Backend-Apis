@@ -32,6 +32,6 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     @Query("SELECT p FROM Producto p WHERE p.stock > 0 ORDER BY p.usuario.nivel DESC")
     List<Producto> findAllOrderByVendedorNivelDesc();
 
-
+    
 
 }

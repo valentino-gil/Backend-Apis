@@ -3,6 +3,7 @@ package com.uade.tpo.MarketPlace.service;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 import com.uade.tpo.MarketPlace.entity.Producto;
 import com.uade.tpo.MarketPlace.entity.dto.FiltroProducto;
@@ -18,4 +19,5 @@ public interface ProductoService {
     public List<ProductoRequest> filtrarProductos(FiltroProducto filtro);
     public ProductoRequest actualizarProducto(Long id, ProductoRequest productoRequest, String emailUsuario);
     public byte[] obtenerImagenProducto(Long productoId) throws SQLException;
+    public Optional<ProductoRequest> getProductoById(Long id);
 }

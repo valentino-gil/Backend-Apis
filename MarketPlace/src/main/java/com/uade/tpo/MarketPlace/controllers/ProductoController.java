@@ -149,4 +149,18 @@ public class ProductoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping("/all/{id}")
+public ResponseEntity<ProductoRequest> getProductoById(@PathVariable Long id) {
+    Optional<ProductoRequest> productoRequest = productoService.getProductoById(id);
+
+    // Si el producto fue encontrado, devolver el ProductoRequest
+    if (productoRequest.isPresent()) {
+        return ResponseEntity.ok(productoRequest.get());
+    } else {
+        // Si no fue encontrado, devolver un 404
+        return ResponseEntity.notFound().build();
+    }
+}
+
 }

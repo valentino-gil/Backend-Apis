@@ -204,4 +204,15 @@ public class ProductoServiceImpl implements ProductoService {
 
         return null; 
     }
+
+    public Optional<ProductoRequest> getProductoById(Long id) {
+        // Buscar el producto en el repositorio
+        Optional<Producto> productoOpt = productoRepository.findById(id);
+    
+        // Si el producto está presente, convertirlo a ProductoRequest
+        return productoOpt.map(this::convertirAProductoRequest);
+    }
+    
+
+    
 }
