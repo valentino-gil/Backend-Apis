@@ -21,7 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-        private final JwtAuthenticationFilter jwtAuthFilter;
+    private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
     @Bean
@@ -30,16 +30,16 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Configura CORS
             .csrf(csrf -> csrf.disable()) // Deshabilita CSRF
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/auth/").permitAll()
-                .requestMatchers("/error/").permitAll()
-                .requestMatchers("/api/producto/all/").permitAll()
-                .requestMatchers("/api/carrito/**").permitAll()
-                .requestMatchers("/api/usuario/").permitAll()
-                .requestMatchers("/api/facturas/**").permitAll()
-                .requestMatchers("/api/producto/").hasAuthority(Role.Vendedor.name())
-                .requestMatchers(HttpMethod.POST, "/api/calificacion/").hasAuthority(Role.Comprador.name())
-                .requestMatchers(HttpMethod.GET, "/api/calificacion/").hasAuthority(Role.Vendedor.name())
-                .requestMatchers("/api/wishlist/").authenticated()
+                .requestMatchers("/api/auth/**").permitAll() // Permite todas las rutas bajo /api/auth/
+                .requestMatchers("/error/**").permitAll()
+                .requestMatchers("/api/producto/all/**").permitAll()
+                .requestMatchers("/api/carrito/**").authenticated()
+                .requestMatchers("/api/usuario/**").authenticated()
+                .requestMatchers("/api/facturas/**").authenticated()
+                .requestMatchers("/api/producto/**").hasAuthority(Role.Vendedor.name())
+                .requestMatchers(HttpMethod.POST, "/api/calificacion/**").hasAuthority(Role.Comprador.name())
+                .requestMatchers(HttpMethod.GET, "/api/calificacion/**").hasAuthority(Role.Vendedor.name())
+                .requestMatchers("/api/wishlist/**").authenticated()
                 .anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)
@@ -55,8 +55,9 @@ public class SecurityConfig {
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowCredentials(true); // Permitir credenciales
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/", configuration);
+        source.registerCorsConfiguration("/**", configuration); // Permitir todas las rutas
         return source;
     }
 }
