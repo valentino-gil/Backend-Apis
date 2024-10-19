@@ -1,16 +1,14 @@
 package com.uade.tpo.MarketPlace.service;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.uade.tpo.MarketPlace.entity.Carrito;
 import com.uade.tpo.MarketPlace.entity.Producto;
 import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.entity.dto.CarritoRequest;
 import com.uade.tpo.MarketPlace.repository.CarritoRepository;
 import com.uade.tpo.MarketPlace.repository.ProductoRepository;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class CarritoService {
@@ -32,7 +30,7 @@ public class CarritoService {
     }
 
     public CarritoRequest modificarCantidad(CarritoRequest carritoRequest, Usuario usuario, int cantidad){
-        Carrito carrito = carritoRepository.findByProducto(carritoRequest.getProducto(),usuario.getId())
+        Carrito carrito = carritoRepository.findById(carritoRequest.getId())
         .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
         carrito.setCantidad(cantidad);
         carritoRepository.save(carrito);
