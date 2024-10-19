@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-import com.uade.tpo.MarketPlace.entity.Producto;
 import com.uade.tpo.MarketPlace.entity.dto.FiltroProducto;
 import com.uade.tpo.MarketPlace.entity.dto.ProductoRequest;
 import com.uade.tpo.MarketPlace.exceptions.ProductoDuplicateException;

@@ -6,12 +6,13 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.uade.tpo.MarketPlace.entity.Carrito;
 import com.uade.tpo.MarketPlace.entity.Facturas;
 import com.uade.tpo.MarketPlace.entity.ItemsFactura;
 import com.uade.tpo.MarketPlace.entity.Producto;
 import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest;
-import com.uade.tpo.MarketPlace.entity.dto.ItemRequest;
+import com.uade.tpo.MarketPlace.repository.CarritoRepository;
 import com.uade.tpo.MarketPlace.repository.FacturasRepository;
 import com.uade.tpo.MarketPlace.repository.ItemsFacturaRepository;
 import com.uade.tpo.MarketPlace.repository.ProductoRepository;
@@ -30,8 +31,11 @@ public class FacturasService {
     @Autowired
     private ProductoRepository productoRepository;
 
+    @Autowired
+    private CarritoRepository carritoRepository;
+
 @Transactional
-public FacturasRequest crearFactura(List<ItemRequest> items, Usuario usuario) {
+public FacturasRequest crearFactura(Usuario usuario) {
     // Crear la nueva factura
     Facturas factura = new Facturas();
     factura.setFecha(new java.sql.Date(System.currentTimeMillis()));
@@ -45,33 +49,35 @@ public FacturasRequest crearFactura(List<ItemRequest> items, Usuario usuario) {
     // Procesar los ítems de la factura
     double montoTotal = 0.0;
 
+    List<Carrito> carrito = carritoRepository.findByUsuarioId(usuario.getId());
     // Validar stock antes de procesar la factura
-    for (ItemRequest itemRequest : items) {
-        Producto producto = productoRepository.findById(itemRequest.getProductoId())
+    for (Carrito c : carrito) {
+        Producto producto = productoRepository.findById(c.getProducto().getId())
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-        if (producto.getStock() < itemRequest.getCantidad()) {
+        if (producto.getStock() < c.getCantidad()) {
+            facturaRepository.delete(factura);
             // Si no hay suficiente stock, lanzamos una excepción
             throw new RuntimeException("Stock insuficiente para el producto: " + producto.getModelo());
         }
     }
 
     // Crear los ítems de la factura y calcular el monto total
-    for (ItemRequest itemRequest : items) {
+    for (Carrito c : carrito) {
         ItemsFactura item = new ItemsFactura();
-        item.setCantidad(itemRequest.getCantidad());
+        item.setCantidad(c.getCantidad());
 
-        Producto producto = productoRepository.findById(itemRequest.getProductoId())
+        Producto producto = productoRepository.findById(c.getProducto().getId())
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
         // Reducir el stock del producto
-        producto.setStock(producto.getStock() - itemRequest.getCantidad());
+        producto.setStock(producto.getStock() - c.getCantidad());
         productoRepository.save(producto); // Guardar la actualización de stock
 
         item.setProducto(producto);
         item.setFactura(facturaGuardada);
 
-        double montoItem = producto.getPrecio() * itemRequest.getCantidad();
+        double montoItem = producto.getPrecio() * c.getCantidad();
         item.setMonto(montoItem);
 
         montoTotal += montoItem;

@@ -2,11 +2,12 @@ package com.uade.tpo.MarketPlace.entity.dto;
 
 
 import com.uade.tpo.MarketPlace.entity.Role;
+import lombok.AllArgsConstructor;
 import com.uade.tpo.MarketPlace.entity.Usuario;
-
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class UsuarioRequest {
     private Long id;
     private String NombreUsuario;

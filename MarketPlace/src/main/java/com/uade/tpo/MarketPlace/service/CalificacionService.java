@@ -2,7 +2,6 @@ package com.uade.tpo.MarketPlace.service;
 
 import java.util.List;
 
-import com.uade.tpo.MarketPlace.entity.Calificacion;
 import com.uade.tpo.MarketPlace.entity.dto.CalificacionRequest;
 
 public interface CalificacionService {

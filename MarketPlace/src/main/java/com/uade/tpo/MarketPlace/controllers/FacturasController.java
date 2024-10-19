@@ -10,16 +10,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uade.tpo.MarketPlace.entity.Facturas;
 import com.uade.tpo.MarketPlace.entity.Role;
 import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.entity.dto.FacturasRequest;
 import com.uade.tpo.MarketPlace.entity.dto.FiltroItemRequest;
-import com.uade.tpo.MarketPlace.entity.dto.ItemRequest;
 import com.uade.tpo.MarketPlace.repository.FacturasRepository;
 import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
 import com.uade.tpo.MarketPlace.service.FacturasService;
@@ -45,13 +42,12 @@ public class FacturasController {
     private FacturasRepository facturasRepository;
 
     @PostMapping
-    public ResponseEntity<FacturasRequest> crearFactura(@RequestBody List<ItemRequest> facturaRequest, 
-                                                    @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<FacturasRequest> crearFactura(@AuthenticationPrincipal UserDetails userDetails) {
         Usuario usuario = buscarUsuario(userDetails);
         if (usuario.getRole() != Role.Comprador){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        FacturasRequest factura = facturaService.crearFactura(facturaRequest,usuario);
+        FacturasRequest factura = facturaService.crearFactura(usuario);
         return ResponseEntity.ok(factura);
     }
 

@@ -1,5 +1,8 @@
 package com.uade.tpo.MarketPlace.controllers.config;
 
+import com.uade.tpo.MarketPlace.entity.Role;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -38,6 +41,9 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Configura CORS
             .csrf(csrf -> csrf.disable()) // Deshabilita CSRF
             .authorizeHttpRequests(authz -> authz
+
+                .requestMatchers("/api/carrito/**").authenticated()
+                .requestMatchers("/api/facturas/**").authenticated()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/error/**").permitAll()
                 .requestMatchers("/api/producto/all/**").permitAll()
@@ -46,7 +52,6 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/calificacion/**").hasAuthority(Role.Vendedor.name())
                 .requestMatchers("/api/wishlist/**").authenticated()
                 .requestMatchers("/api/usuario/perfil").authenticated() // Permitir acceso a este endpoint solo para usuarios autenticados
-
                 .anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)
