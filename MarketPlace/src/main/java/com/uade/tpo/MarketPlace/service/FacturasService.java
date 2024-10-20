@@ -34,15 +34,17 @@ public class FacturasService {
     @Autowired
     private CarritoRepository carritoRepository;
 
+    @Autowired
+    private List<String> descuentos;
+
 @Transactional
-public FacturasRequest crearFactura(Usuario usuario) {
+public FacturasRequest crearFactura(Usuario usuario, String descuento) {
     // Crear la nueva factura
     Facturas factura = new Facturas();
     factura.setFecha(new java.sql.Date(System.currentTimeMillis()));
     factura.setMonto(0.0); // El monto se calculará más tarde
     factura.setDescuento(0.0);
     factura.setUsuario(usuario);
-
     // Guardar la factura primero
     Facturas facturaGuardada = facturaRepository.save(factura);
 
@@ -84,13 +86,14 @@ public FacturasRequest crearFactura(Usuario usuario) {
         itemsFacturaRepository.save(item); // Guardar el ítem de la factura
     }
 
+    //Vaciar el carrito del usuario
+    carritoRepository.deleteByUsuarioId(usuario.getId());;
+
+    inicializarDescuentos();
     // Aplicar descuentos
-    if (montoTotal >= 1000) {
+    if (descuentos.contains(descuento)) {
         montoTotal *= 0.90; // Descuento del 10%
         facturaGuardada.setDescuento(0.10);
-    } else if (montoTotal >= 500) {
-        montoTotal *= 0.95; // Descuento del 5%
-        facturaGuardada.setDescuento(0.05);
     }
 
     // Verificar si el monto total es cero y eliminar la factura si no se procesaron ítems válidos
@@ -123,5 +126,10 @@ public FacturasRequest crearFactura(Usuario usuario) {
                 factura.getFecha(),
                 factura.getUsuario().getId()
         );
+    }
+
+    private void inicializarDescuentos(){
+        descuentos.add("bienvenida");
+        descuentos.add("descuento10");
     }
 }
