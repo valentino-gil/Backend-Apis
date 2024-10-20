@@ -41,13 +41,13 @@ public class FacturasController {
     @Autowired
     private FacturasRepository facturasRepository;
 
-    @PostMapping
-    public ResponseEntity<FacturasRequest> crearFactura(@AuthenticationPrincipal UserDetails userDetails) {
+    @PostMapping("/{descuento}")
+    public ResponseEntity<FacturasRequest> crearFactura(@PathVariable String descuento, @AuthenticationPrincipal UserDetails userDetails) {
         Usuario usuario = buscarUsuario(userDetails);
         if (usuario.getRole() != Role.Comprador){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        FacturasRequest factura = facturaService.crearFactura(usuario);
+        FacturasRequest factura = facturaService.crearFactura(usuario, descuento);
         return ResponseEntity.ok(factura);
     }
 
