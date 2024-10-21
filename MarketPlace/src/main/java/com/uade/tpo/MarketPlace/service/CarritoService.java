@@ -46,7 +46,10 @@ public class CarritoService {
     public CarritoRequest modificarCantidad(CarritoRequest carritoRequest, Usuario usuario, int cantidad){
         Carrito carrito = carritoRepository.findById(carritoRequest.getId())
         .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-        carrito.setCantidad(cantidad);
+        Producto producto = productoRepository.getReferenceById(carrito.getProducto().getId());
+        if (producto.getStock() < cantidad){
+            carrito.setCantidad(cantidad);
+        }
         carritoRepository.save(carrito);
         return convertirACarritoRequest(carrito);
     }
