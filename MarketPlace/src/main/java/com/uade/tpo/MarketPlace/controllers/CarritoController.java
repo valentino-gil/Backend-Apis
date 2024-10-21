@@ -1,11 +1,7 @@
 package com.uade.tpo.MarketPlace.controllers;
 
-import com.uade.tpo.MarketPlace.entity.Role;
-import com.uade.tpo.MarketPlace.entity.Usuario;
-import com.uade.tpo.MarketPlace.entity.dto.CarritoRequest;
-import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
-import com.uade.tpo.MarketPlace.service.CarritoService;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.uade.tpo.MarketPlace.entity.Role;
+import com.uade.tpo.MarketPlace.entity.Usuario;
+import com.uade.tpo.MarketPlace.entity.dto.CarritoRequest;
+import com.uade.tpo.MarketPlace.repository.UsuarioRepository;
+import com.uade.tpo.MarketPlace.service.CarritoService;
+
 @RestController
 @RequestMapping("api/carrito")
 public class CarritoController {
@@ -29,7 +31,7 @@ public class CarritoController {
     @Autowired
     private UsuarioRepository UsuarioRepository;
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<CarritoRequest> agregarCarrito(@RequestBody CarritoRequest carritoRequest, 
                                                         @AuthenticationPrincipal UserDetails userDetails){
         Usuario usuario = buscarUsuario(userDetails);

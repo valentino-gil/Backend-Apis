@@ -1,5 +1,6 @@
 package com.uade.tpo.MarketPlace.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,6 @@ public class FacturasService {
     @Autowired
     private CarritoRepository carritoRepository;
 
-    @Autowired
     private List<String> descuentos;
 
 @Transactional
@@ -87,7 +87,10 @@ public FacturasRequest crearFactura(Usuario usuario, String descuento) {
     }
 
     //Vaciar el carrito del usuario
-    carritoRepository.deleteByUsuarioId(usuario.getId());;
+    List<Carrito> carritos = carritoRepository.findByUsuarioId(usuario.getId());
+    for (Carrito c : carritos) {
+        carritoRepository.delete(c);
+    }
 
     inicializarDescuentos();
     // Aplicar descuentos
@@ -118,6 +121,13 @@ public FacturasRequest crearFactura(Usuario usuario, String descuento) {
         .collect(Collectors.toList());
     }
 
+    public double obtenerDescuento(String descuento){
+        inicializarDescuentos();
+        if (descuentos.contains(descuento))
+            return 0.10;
+        return 0;
+    }
+
     private FacturasRequest convertirAFacturaRequest(Facturas factura) {
         return new FacturasRequest(
                 factura.getId(),
@@ -129,6 +139,7 @@ public FacturasRequest crearFactura(Usuario usuario, String descuento) {
     }
 
     private void inicializarDescuentos(){
+        descuentos = new ArrayList<>();
         descuentos.add("bienvenida");
         descuentos.add("descuento10");
     }

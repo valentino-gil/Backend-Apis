@@ -70,6 +70,11 @@ public class FacturasController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
+
+    @GetMapping("/descuento/{descuento}") 
+    public ResponseEntity<Double> ObtenerDescuento(@PathVariable String descuento){
+        return ResponseEntity.ok(facturaService.obtenerDescuento(descuento));
+    }
     
     private Usuario buscarUsuario(UserDetails userDetails){
         String usuario = userDetails.getUsername();
