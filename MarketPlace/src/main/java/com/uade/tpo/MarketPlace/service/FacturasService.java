@@ -97,6 +97,8 @@ public FacturasRequest crearFactura(Usuario usuario, String descuento) {
     if (descuentos.contains(descuento)) {
         montoTotal *= 0.90; // Descuento del 10%
         facturaGuardada.setDescuento(0.10);
+    }else{
+        facturaGuardada.setDescuento(0.10);
     }
 
     // Verificar si el monto total es cero y eliminar la factura si no se procesaron ítems válidos

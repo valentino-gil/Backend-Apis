@@ -19,4 +19,5 @@ public interface ProductoService {
     public ProductoRequest actualizarProducto(Long id, ProductoRequest productoRequest, String emailUsuario);
     public byte[] obtenerImagenProducto(Long productoId) throws SQLException;
     public Optional<ProductoRequest> getProductoById(Long id);
+    public List<ProductoRequest> obtenerTodosProductos();
 }
