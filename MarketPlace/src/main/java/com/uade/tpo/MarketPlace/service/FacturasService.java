@@ -35,7 +35,7 @@ public class FacturasService {
     @Autowired
     private CarritoRepository carritoRepository;
 
-    private List<String> descuentos;
+    private List<String> descuentos = new ArrayList<>();
 
 @Transactional
 public FacturasRequest crearFactura(Usuario usuario, String descuento) {
@@ -62,29 +62,28 @@ public FacturasRequest crearFactura(Usuario usuario, String descuento) {
             // Si no hay suficiente stock, lanzamos una excepción
             throw new RuntimeException("Stock insuficiente para el producto: " + producto.getModelo());
         }
-    }
 
-    // Crear los ítems de la factura y calcular el monto total
-    for (Carrito c : carrito) {
-        ItemsFactura item = new ItemsFactura();
-        item.setCantidad(c.getCantidad());
+        // Crear los ítems de la factura y calcular el monto total
+        for (Carrito c : carrito) {
+            ItemsFactura item = new ItemsFactura();
+            item.setCantidad(c.getCantidad());
 
-        Producto producto = productoRepository.findById(c.getProducto().getId())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            Producto producto = productoRepository.findById(c.getProducto().getId())
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-        // Reducir el stock del producto
-        producto.setStock(producto.getStock() - c.getCantidad());
-        productoRepository.save(producto); // Guardar la actualización de stock
+            // Reducir el stock del producto
+            producto.setStock(producto.getStock() - c.getCantidad());
+            productoRepository.save(producto); // Guardar la actualización de stock
 
-        item.setProducto(producto);
-        item.setFactura(facturaGuardada);
+            item.setProducto(producto);
+            item.setFactura(facturaGuardada);
 
-        double montoItem = producto.getPrecio() * c.getCantidad();
-        item.setMonto(montoItem);
+            double montoItem = producto.getPrecio() * c.getCantidad();
+            item.setMonto(montoItem);
 
-        montoTotal += montoItem;
-        itemsFacturaRepository.save(item); // Guardar el ítem de la factura
-    }
+            montoTotal += montoItem;
+            itemsFacturaRepository.save(item); // Guardar el ítem de la factura
+        }
 
     //Vaciar el carrito del usuario
     List<Carrito> carritos = carritoRepository.findByUsuarioId(usuario.getId());
@@ -98,23 +97,22 @@ public FacturasRequest crearFactura(Usuario usuario, String descuento) {
         montoTotal *= 0.90; // Descuento del 10%
         facturaGuardada.setDescuento(0.10);
     }else{
-        facturaGuardada.setDescuento(0.10);
+        facturaGuardada.setDescuento(0.0);
     }
 
-    // Verificar si el monto total es cero y eliminar la factura si no se procesaron ítems válidos
-    if (montoTotal == 0.0) {
-        facturaRepository.delete(facturaGuardada);
-        throw new RuntimeException("No se pudo procesar la factura debido a falta de stock en todos los productos.");
+        // Verificar si el monto total es cero y eliminar la factura si no se procesaron ítems válidos
+        if (montoTotal == 0.0) {
+            facturaRepository.delete(facturaGuardada);
+            throw new RuntimeException("No se pudo procesar la factura debido a falta de stock en todos los productos.");
+        }
+
+        // Actualizar el monto total de la factura
+        facturaGuardada.setMonto(montoTotal);
+        facturaRepository.save(facturaGuardada);
+
+        // Convertir la factura guardada a un DTO para devolverla
+        return convertirAFacturaRequest(facturaGuardada);
     }
-
-    // Actualizar el monto total de la factura
-    facturaGuardada.setMonto(montoTotal);
-    facturaRepository.save(facturaGuardada);
-
-    // Convertir la factura guardada a un DTO para devolverla
-    return convertirAFacturaRequest(facturaGuardada);
-}
-    
 
     public List<FacturasRequest> obtenerFacturas(Usuario usuario){
         List<Facturas> facturas = facturaRepository.findAllFacturasUsuario(usuario.getId());
@@ -140,9 +138,11 @@ public FacturasRequest crearFactura(Usuario usuario, String descuento) {
         );
     }
 
+    // Método que inicializa la lista de descuentos
     private void inicializarDescuentos(){
         descuentos = new ArrayList<>();
         descuentos.add("bienvenida");
         descuentos.add("descuento10");
     }
 }
+
