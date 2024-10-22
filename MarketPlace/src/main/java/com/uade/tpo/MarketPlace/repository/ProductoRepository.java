@@ -35,4 +35,6 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     @Query("SELECT p FROM Producto p ORDER BY p.usuario.nivel DESC")
     List<Producto> findAllProductos();
 
+    List<Producto> findByUsuarioId(Long usuarioId);
+
 }

@@ -169,4 +169,15 @@ public ResponseEntity<ProductoRequest> getProductoById(@PathVariable Long id) {
         return ResponseEntity.ok(productos);
     }
 
+    @GetMapping("/misVehiculos")
+    public ResponseEntity<List<ProductoRequest>> obtenerMisProductos(@AuthenticationPrincipal UserDetails userDetails) {
+        // Obtener el email del usuario autenticado
+        String emailUsuario = userDetails.getUsername();
+
+        // Obtener la lista de productos del usuario
+        List<ProductoRequest> misProductos = productoService.obtenerProductosPorUsuario(emailUsuario);
+
+        return ResponseEntity.ok(misProductos);
+    }
+
 }

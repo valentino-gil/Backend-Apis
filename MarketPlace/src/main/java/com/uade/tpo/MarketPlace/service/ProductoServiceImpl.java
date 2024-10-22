@@ -219,5 +219,19 @@ public class ProductoServiceImpl implements ProductoService {
             .map(producto -> convertirAProductoRequest(producto))
             .collect(Collectors.toList());
     }
+
+    public List<ProductoRequest> obtenerProductosPorUsuario(String emailUsuario) {
+        // Buscar el usuario por su email
+        Usuario usuario = usuarioRepository.findBymail(emailUsuario)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Obtener los productos del usuario
+        List<Producto> productos = productoRepository.findByUsuarioId(usuario.getId());
+
+        // Convertir la lista de Producto a ProductoRequest
+        return productos.stream()
+                .map(this::convertirAProductoRequest)
+                .collect(Collectors.toList());
+    }
     
 }
