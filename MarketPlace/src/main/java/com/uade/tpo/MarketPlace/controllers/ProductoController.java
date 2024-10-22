@@ -163,4 +163,10 @@ public ResponseEntity<ProductoRequest> getProductoById(@PathVariable Long id) {
     }
 }
 
+    @GetMapping("/all/all")
+    public ResponseEntity<List<ProductoRequest>> getAllProductos(){
+        List<ProductoRequest> productos = productoService.obtenerTodosProductos();
+        return ResponseEntity.ok(productos);
+    }
+
 }

@@ -212,7 +212,12 @@ public class ProductoServiceImpl implements ProductoService {
         // Si el producto está presente, convertirlo a ProductoRequest
         return productoOpt.map(this::convertirAProductoRequest);
     }
-    
 
+    public List<ProductoRequest> obtenerTodosProductos(){
+        List<Producto> productos = productoRepository.findAllProductos();
+        return productos.stream()
+            .map(producto -> convertirAProductoRequest(producto))
+            .collect(Collectors.toList());
+    }
     
 }

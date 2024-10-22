@@ -1,14 +1,17 @@
 package com.uade.tpo.MarketPlace.service;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.uade.tpo.MarketPlace.entity.Carrito;
 import com.uade.tpo.MarketPlace.entity.Producto;
 import com.uade.tpo.MarketPlace.entity.Usuario;
 import com.uade.tpo.MarketPlace.entity.dto.CarritoRequest;
 import com.uade.tpo.MarketPlace.repository.CarritoRepository;
 import com.uade.tpo.MarketPlace.repository.ProductoRepository;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class CarritoService {
@@ -19,21 +22,35 @@ public class CarritoService {
     private ProductoRepository productoRepository;
 
     public CarritoRequest agregarCarrito(CarritoRequest carritoRequest, Usuario usuario){
-        Carrito carrito = new Carrito();
-        carrito.setCantidad(carritoRequest.getCantidad());
+        Optional<Carrito> carritoOptional = carritoRepository.findByProducto(carritoRequest.getProducto(), usuario.getId());
         Producto producto = productoRepository.findById(carritoRequest.getProducto())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-        carrito.setProducto(producto);
-        carrito.setUsuario(usuario);
-        carritoRepository.save(carrito);
-        return convertirACarritoRequest(carrito);
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        Carrito carritoGuardado = carritoOptional.map(carrito -> {
+            carrito.setCantidad(carrito.getCantidad() + carritoRequest.getCantidad());
+            carritoRepository.save(carrito);
+            return carrito;
+        }).orElseGet(
+        () -> {
+            carritoRepository.findByProducto(carritoRequest.getProducto(), usuario.getId()).isEmpty();
+            Carrito carritoNuevo = new Carrito();
+            carritoNuevo.setCantidad(carritoRequest.getCantidad());
+            carritoNuevo.setProducto(producto);
+            carritoNuevo.setUsuario(usuario);
+            carritoRepository.save(carritoNuevo);
+            return carritoNuevo;
+        }
+        );
+        return convertirACarritoRequest(carritoGuardado);
     }
 
     public CarritoRequest modificarCantidad(CarritoRequest carritoRequest, Usuario usuario, int cantidad){
         Carrito carrito = carritoRepository.findById(carritoRequest.getId())
         .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-        carrito.setCantidad(cantidad);
-        carritoRepository.save(carrito);
+        Producto producto = productoRepository.getReferenceById(carrito.getProducto().getId());
+        if (producto.getStock() > cantidad){
+            carrito.setCantidad(cantidad);
+            carritoRepository.save(carrito);
+        }
         return convertirACarritoRequest(carrito);
     }
 
