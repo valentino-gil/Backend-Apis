@@ -37,6 +37,9 @@ public class FacturasService {
 
     private List<String> descuentos = new ArrayList<>();
 
+
+
+
 @Transactional
 public FacturasRequest crearFactura(Usuario usuario, String descuento) {
     // Crear la nueva factura
@@ -64,21 +67,21 @@ public FacturasRequest crearFactura(Usuario usuario, String descuento) {
         }
 
         // Crear los ítems de la factura y calcular el monto total
-        for (Carrito c : carrito) {
+        for (Carrito carry : carrito) {
             ItemsFactura item = new ItemsFactura();
-            item.setCantidad(c.getCantidad());
+            item.setCantidad(carry.getCantidad());
 
-            Producto producto = productoRepository.findById(c.getProducto().getId())
+            Producto p = productoRepository.findById(carry.getProducto().getId())
                     .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
             // Reducir el stock del producto
-            producto.setStock(producto.getStock() - c.getCantidad());
-            productoRepository.save(producto); // Guardar la actualización de stock
+            p.setStock(p.getStock() - carry.getCantidad());
+            productoRepository.save(p); // Guardar la actualización de stock
 
-            item.setProducto(producto);
+            item.setProducto(p);
             item.setFactura(facturaGuardada);
 
-            double montoItem = producto.getPrecio() * c.getCantidad();
+            double montoItem = p.getPrecio() * carry.getCantidad();
             item.setMonto(montoItem);
 
             montoTotal += montoItem;
@@ -87,8 +90,8 @@ public FacturasRequest crearFactura(Usuario usuario, String descuento) {
 
     //Vaciar el carrito del usuario
     List<Carrito> carritos = carritoRepository.findByUsuarioId(usuario.getId());
-    for (Carrito c : carritos) {
-        carritoRepository.delete(c);
+    for (Carrito cart : carritos) {
+        carritoRepository.delete(cart);
     }
 
     inicializarDescuentos();
@@ -109,10 +112,12 @@ public FacturasRequest crearFactura(Usuario usuario, String descuento) {
         // Actualizar el monto total de la factura
         facturaGuardada.setMonto(montoTotal);
         facturaRepository.save(facturaGuardada);
-
+    }
         // Convertir la factura guardada a un DTO para devolverla
         return convertirAFacturaRequest(facturaGuardada);
-    }
+    
+
+}
 
     public List<FacturasRequest> obtenerFacturas(Usuario usuario){
         List<Facturas> facturas = facturaRepository.findAllFacturasUsuario(usuario.getId());
@@ -137,6 +142,7 @@ public FacturasRequest crearFactura(Usuario usuario, String descuento) {
                 factura.getUsuario().getId()
         );
     }
+    
 
     // Método que inicializa la lista de descuentos
     private void inicializarDescuentos(){
@@ -145,4 +151,10 @@ public FacturasRequest crearFactura(Usuario usuario, String descuento) {
         descuentos.add("descuento10");
     }
 }
+
+
+
+
+
+
 
