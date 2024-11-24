@@ -180,4 +180,16 @@ public ResponseEntity<ProductoRequest> getProductoById(@PathVariable Long id) {
         return ResponseEntity.ok(misProductos);
     }
 
+    @GetMapping("/all/buscar")
+public ResponseEntity<List<ProductoRequest>> buscarProductos(@RequestParam String query) {
+    try {
+        List<ProductoRequest> productos = productoService.buscarProductosPorMarcaOModelo(query);
+        return ResponseEntity.ok(productos);
+    } catch (Exception e) {
+        logger.error("Error al buscar productos: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+}
+
+
 }

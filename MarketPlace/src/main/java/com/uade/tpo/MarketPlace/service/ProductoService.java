@@ -21,4 +21,5 @@ public interface ProductoService {
     public Optional<ProductoRequest> getProductoById(Long id);
     public List<ProductoRequest> obtenerTodosProductos();
     public List<ProductoRequest> obtenerProductosPorUsuario(String emailUsuario);
+    public List<ProductoRequest> buscarProductosPorMarcaOModelo(String query);
 }

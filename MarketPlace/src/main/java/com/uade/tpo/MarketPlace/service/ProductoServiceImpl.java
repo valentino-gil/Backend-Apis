@@ -233,5 +233,16 @@ public class ProductoServiceImpl implements ProductoService {
                 .map(this::convertirAProductoRequest)
                 .collect(Collectors.toList());
     }
+
+    public List<ProductoRequest> buscarProductosPorMarcaOModelo(String query) {
+        // Filtrar por marca o modelo (puedes personalizar esta lógica)
+        return productoRepository.findAll().stream()
+                .filter(producto -> 
+                    producto.getMarca().toLowerCase().contains(query.toLowerCase()) ||
+                    producto.getModelo().toLowerCase().contains(query.toLowerCase()))
+                .map(this::convertirAProductoRequest)
+                .collect(Collectors.toList());
+    }
+    
     
 }
