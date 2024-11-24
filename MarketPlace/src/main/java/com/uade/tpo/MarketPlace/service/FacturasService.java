@@ -150,7 +150,45 @@ public FacturasRequest crearFactura(Usuario usuario, String descuento) {
         descuentos.add("bienvenida");
         descuentos.add("descuento10");
     }
-}
+
+
+
+
+    public FacturasRequest comprarAhora(Usuario usuario, String descuento, long producto) {
+
+        Producto p = productoRepository.findById(producto)
+        .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        Facturas factura = new Facturas();
+    factura.setFecha(new java.sql.Date(System.currentTimeMillis()));
+    factura.setMonto(p.getPrecio()); // El monto se calculará más tarde
+    inicializarDescuentos();
+    if(descuentos.contains(descuento)){
+        factura.setDescuento(0.1);
+    }
+    else{
+        factura.setDescuento(0);
+    }
+    factura.setUsuario(usuario);
+    // Guardar la factura primero
+    Facturas facturaGuardada = facturaRepository.save(factura);
+
+    ItemsFactura item = new ItemsFactura();
+    item.setCantidad(1);
+    item.setMonto(p.getPrecio());
+
+
+    p.setStock(p.getStock() - 1);
+            productoRepository.save(p); // Guardar la actualización de stock
+
+            item.setProducto(p);
+            item.setFactura(facturaGuardada);
+
+            itemsFacturaRepository.save(item);
+            return convertirAFacturaRequest(facturaGuardada);
+        }
+
+    }
 
 
 

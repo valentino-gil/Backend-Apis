@@ -81,4 +81,19 @@ public class FacturasController {
         return UsuarioRepository.findByMail(usuario)
         .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
-}
+
+    @PostMapping("/{producto}/{descuento}")
+    public ResponseEntity<FacturasRequest> comprarAhora(@PathVariable String descuento, @AuthenticationPrincipal UserDetails userDetails, @PathVariable Long producto){
+        Usuario usuario = buscarUsuario(userDetails);
+        if (usuario.getRole() != Role.Comprador){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        FacturasRequest factura = facturaService.comprarAhora(usuario, descuento, producto);
+        return ResponseEntity.ok(factura);
+    }
+
+    }
+
+
+
+
