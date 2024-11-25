@@ -27,6 +27,7 @@ public class CalificacionController {
     @Autowired
     private CalificacionService calificacionService;
 
+    //metodo para calificar al vendedor
     @PostMapping("/{vendedorId}")
 public ResponseEntity<?> agregarCalificacion(@PathVariable Long vendedorId,
                                              @RequestBody CalificacionRequest calificacionRequest,
